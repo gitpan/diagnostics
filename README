@@ -1,0 +1,59 @@
+This is an alpha version of the core module diagnostics.
+
+It is based on the 5.7.3 distribution, with a few
+bugs fixed and a few features added. Yet, you can
+retrofit your 5.6.0 (or later) installation
+with this updated module.
+
+INSTALLATION
+
+First, backup you Perl directory tree (you always do that when you install
+any alpha-version module, don't ya?). Backup also the splain script
+from /usr/local/bin or wherever.
+
+Then the usual 4-step incantation:
+  perl Makefile.PL
+  make
+  make test (*)
+and with the proper authorization level
+  make install
+
+(*) Note that some errors occur if you still have Perl 5.6.0. This only means
+that explanations in 5.6.1 were more precise and more complete than in
+5.6.0. Just try
+  perl -Mblib t/21-enable.pl
+  perl -Mblib t/22-diagfile.pl
+and use the TLAR method (that looks about right), comparing with
+t/21-enable.out and t/22-diagfile.out
+
+ALPHA WARNING
+
+Please note that this is an alpha version. A few words of caution:
+- The API may change.
+- The naming scheme for perldiag files may change.
+- Translations exist only for 5.6.0, 5.6.1 and 5.7.3. Other Perl versions
+will have to do with either one.
+- splain has not been tested.
+- The module does not work on exotic architectures (VMS, Mac OS
+Classic, OS/390...). Maybe you can tell me what I should add to the
+module so it will work in the next version...
+
+
+DISTRIBUTION
+
+This is a core module, therefore it will be distributed within
+the standard Perl distribution (I hope). 
+
+But at the same time, the module will exist as a separate 
+one in CPAN, because this archive will contain files that
+do not belong in the standard Perl distribution: 
+translated podfiles, and test files.
+
+Also, the new diagnostics module will appear in Perl 5.8.1 at
+the soonest, so people who still use a version from 5.6.0 to
+5.8.0 might want to retrofit their installations.
+
+CONTACT
+
+For the 1.2 version, write to me, JFORGET@cpan.org. Do not try the
+Perl-5 Porters yet.

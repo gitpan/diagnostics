@@ -1,0 +1,13 @@
+Revision history for Perl extension diagnostics.
+
+1.2-alpha Thu Apr 11 22:24:13 2002
+	- original version; created by h2xs 1.19, based on the 5.7.3 distribution
+        - added splainthese function to fix bug # 20020425.019
+        - added findpods function to enable multiple languages and modules
+        - replaced Getopt::Std by Getopt::Long, and added parse_option function.
+        - changed current debug statements to select which category to
+	print, and added many others.
+        - changed the "regexp-to-printf" converter, so extracting the
+	square root or the logarithm of a negative number will be
+	properly explained.
+

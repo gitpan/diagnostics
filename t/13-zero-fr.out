@@ -1,0 +1,4 @@
+    (Division par zéro illégale) (F) Vous avez essayé de diviser un
+    nombre par 0. Soit quelque chose clochait dans votre logique, soit
+    vous devez placer une condition pour vous préserver de cette entrée
+    dénuée de sens.

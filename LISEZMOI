@@ -1,0 +1,72 @@
+Ceci est une version alpha du module standard diagnostics.pm.
+
+Cette version est basée sur le module diagnostics.pm de la 
+distribution 5.7.3, mais il est possible d'installer cette
+version dans une installation 5.6.0 ou plus.
+
+Cette version comporte quelques corrections de bug, et quelques
+fonctionnalités nouvelles, dont la possibilité d'avoir
+des explications en français ou dans une autre langue.
+
+INSTALLATION
+
+Il s'agit d'un module standard en version alpha. Donc, commencez par
+sauvegarder votre arborescence Perl (c'est d'ailleurs ce que vous 
+faites chaque fois que vous installez un module alpha, non?). 
+Sauvegardez également le script splain, qui doit se trouver
+dans un répertoire du genre /usr/local/bin.
+
+Ensuite comme d'habitude :
+  perl Makefile.PL
+  make
+  make test (*)
+et avec un niveau d'autorisation correct
+  make install
+
+(*) Certains tests renvoient NOK sur Perl-5.6.0. C'est dû au fait
+que les explications sont plus succintes en 5.6.0 qu'en 5.6.1 
+et en 5.7.3. Mais essayez
+  perl -Mblib t/21-enable.pl
+  perl -Mblib t/22-diagfile.pl
+et voyez si cela correspond à peu près à t/21-enable.out et
+t/22-diagfile.out.
+
+AVERTISSEMENT, VERSION ALPHA
+
+Cette version est une version alpha. D'où les avertissements suivants :
+
+- faites une sauvegarde,
+- l'interface utilisateur est susceptible de changer,
+- la façon dont les fichiers sont nommés peut changer,
+- les traductions existent uniquement pour la version 5.6.0, la
+version 5.6.1 et la version 5.7.3 (les autres versions devront se
+débrouiller avec l'une des deux),
+- je n'ai pas encore testé splain,
+- il y a sûrement de nouveaux messages en 5.8.0, mais je n'ai pas
+encore vérifié,
+- le module ne fonctionne pas sur les architectures exotiques (VMS,
+Mac OS Classic, OS/390); mais vous pouvez peut-être m'expliquer
+comment adapter le module pour que la prochaine version soit compatible
+avec ces architectures...
+
+DIFFUSION
+
+C'est un module du noyau, donc il fera partie intégrante d'une
+prochaine distribution standard (enfin, j'espère !).
+
+Cela dit, le module existe également de façon indépendante
+sur CPAN, car il comporte des fichiers qui n'ont rien à faire
+dans la distribution standard : les fichiers de test et la
+traduction des fichiers pod en français.
+
+En outre, tout le monde n'a pas forcément la dernière version de
+Perl. Donc, ceux qui utilisent encore une version entre la 5.6.0
+et la 5.8.0 auront peut-être envie de mettre partiellement à niveau
+leur installation, et la diffusion de ce module par CPAN leur
+permet cette mise à niveau pertielle.
+
+CONTACT
+
+Pour la version 1.2, adressez-vous à moi, JFORGET@cpan.org. Inutile de
+demander aux Perl-5 Porters.
+

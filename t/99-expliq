@@ -1,0 +1,26 @@
+my @script = @ARGV;
+
+my $i = 0;
+foreach (@script)
+  {
+    ++$i;
+    open T, "perl  t/$_.pl   2>&1 > /dev/null |" or die "Ouverture (1) : $!";
+    my @tstlines = map { split /\s+/ } <T>;
+    open R, "./t/$_.out" or die "Ouverture (2) : $!";
+    my @reflines = map { split /\s+/ } <R>;
+    close R or die "Fermeture (2) : $!";
+
+    my $prefix = '';
+    foreach (0..$#tstlines)
+      {
+        if ($tstlines[$_] ne $reflines[$_]) 
+          {
+            last if $tstlines[$_] eq 'Uncaught';
+            $prefix = 'not '; 
+            print "$_ $tstlines[$_] ne $reflines[$_]\n";
+            last;
+          }
+      }
+    print "$i $prefix ok\n";
+  }
+exit(0);

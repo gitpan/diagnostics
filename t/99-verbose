@@ -1,0 +1,87 @@
+my @script = @ARGV;
+
+my $i = 0;
+foreach (@script)
+  {
+    ++$i;
+    my @tstlines;
+    if ($^O =~ /Win32/)
+      {
+        my @result = capture("perl -Mblib t/$_.pl", "", "");
+        @tstlines = map { split /\s+/ } grep /^    \S/, split "\n", $result[1];
+      }
+    else
+      {
+        open T, "perl -Mblib t/$_.pl   2>&1 > /dev/null |" or die "Ouverture (1) : $!";
+        @tstlines = map { split /\s+/ } grep /^    \S/, <T>;
+      }
+    open R, "./t/$_.out" or die "Ouverture (2) : $!";
+    my @reflines = map { split /\s+/ } grep /^    \S/, <R>;
+    close R or die "Fermeture (2) : $!";
+
+    my $prefix = '';
+    foreach (0..$#tstlines)
+      {
+        print "$_ $tstlines[$_] <-> $reflines[$_]\n" 
+	                   if $tstlines[$_] eq $reflines[$_];
+        print "$_ $tstlines[$_] <=> $reflines[$_]\n" 
+                           if $tstlines[$_] ne $reflines[$_];
+      }
+    print "$i $prefix ok\n";
+  }
+exit(0);
+
+sub capture {
+    my ( $cmd, $args, $input ) = @_;
+    #my $infile  = tmpnam;
+    my $errfile = 'tmpnam';
+    my ( $out, $err ) = ( "", "" );
+    local *F;
+    local *OLDERR;
+
+    # concatenate the command-line parameters
+    $cmd .= " $args";
+
+    # if there is some input
+    #if ($input) {
+    #    local *F;
+    #    open F, "> $infile"
+    #      or die "fatal: could not open temporay input file $infile: $!";
+    #    print F $input;
+    #    close F;
+    #    $cmd .= " < $infile";
+    #}
+
+    # swap errputs
+    open OLDERR, ">&STDERR"
+      or die "fatal: could not duplicate STDERR: $!";
+    close STDERR;
+    open STDERR, "> $errfile"
+      or die "fatal: could not open temporay errput file $errfile: $!";
+
+    # run the command
+    $out = `$cmd`;
+
+    # put things back to normal
+    close STDERR;
+    open STDERR, ">&OLDERR"
+      or die "fatal: could not duplicate STDERR: $!";
+    close(OLDERR);
+
+    # this is tedious, but...
+    local $/;    # slurp
+    open F, $errfile
+      or die "fatal: could not open temporay errput file $errfile: $!";
+    $err = <F>;
+    close F;
+
+    # cleanup
+    #if ($input) {
+    #    unlink $infile
+    #      or warn "warning: could not remove temporary input file $errfile: $!";
+    #}
+    #unlink $errfile
+    #  or warn "warning: could not remove temporary errput file $errfile: $!";
+
+    return ( $out, $err, $? >> 8 );
+}

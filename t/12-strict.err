@@ -1,0 +1,2 @@
+Global symbol "$x" requires explicit package name at t/12-strict.pl line 4.
+Execution of t/12-strict.pl aborted due to compilation errors.

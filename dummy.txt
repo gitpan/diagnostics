@@ -1,0 +1,18 @@
+=for diagnostics
+start decription
+
+=head1 DESCRIPTION
+
+This file contains dummy explainations, to test that the user
+can provide his/her/its own diagfile.
+
+=for diagnostics
+start items
+
+=item Illegal division by zero
+
+This is a dummy message for the division by zero.
+
+=item Name "%s::%s" used only once: possible typo
+
+This is a dummy message for the used only once warning.

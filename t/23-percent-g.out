@@ -1,0 +1,4 @@
+    (F) For ordinary real numbers, you can't take the logarithm of a
+    negative number or zero. There's a Math::Complex package that comes
+    standard with Perl, though, if you really want to do that for the
+    negative numbers.

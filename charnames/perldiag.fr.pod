@@ -1,0 +1,65 @@
+=for diagnostics
+start description
+
+=head1 DESCRIPTION
+
+Voici les diagnostics qui peuvent être déclenchés lors de
+l'utilisation du module de pragma C<charnames>.
+
+=over 4
+
+=for diagnostics
+start items
+
+=item Unknown charname '%s'
+
+(Nom de caractère I<%s> inconnu) Le nom que vous avez spécifié
+est inconnu. Reportez-vous à la base de données Unicode.
+
+=item Character 0x%s with name '%s' is above 0xFF
+
+(Le caractère 0xI<%s>, nommé 'I<%s>' dépasse 0xFF)
+Lorsque le pragma C<bytes> est actif, vous ne pouvez pas 
+faire référence à un caractère au-delà de 0xFF.
+
+=item `use charnames' needs explicit imports list
+
+(C<use charnames> requiert une liste d'importation)
+Le module de pragma  C<charnames> n'importe rien par
+défaut. Vous devez spécifier au moins un nom de caractères
+pour pouvoir l'utiliser.
+
+=item charnames::viacode() expects one numeric argument
+
+(C<charnames::viacode()> s'attend à recevoir un argument numérique)
+La fonction C<viacode> sert à obtenir le nom symbolique correspondant
+au code en paramètre. Elle accepte donc un seul paramètre, et ce
+paramètre doit être numérique. Pourquoi voulez-vous envoyer un
+paramètre alphabétique, ou plusieurs paramètres ? Si vous voulez
+obtenir le nom de plusieurs caractères, utilisez une boucle ou
+un C<map>.
+
+=item unexpected arg \"%s\" to charnames::viacode()
+
+(Argument I<%s> inattendu pour C<charnames::viacode()>)
+
+To be completed
+
+=item Unicode characters only allocated up to 0x10FFFF (you asked for %s)";
+
+(L'allocation des caractères Unicode se termine en 0x10FFFF, vous
+avez demandé I<%s>). La version actuelle du standard Unicode se termine
+en C<0x10FFFF>. Un nombre supérieur à cette limite ne correspond
+à aucun caractère.
+
+=item charnames::vianame() expects one name argument
+
+(C<charnames::vianame()> s'attend à recevoir un nom comme argument)
+La fonction C<vianame> sert à obtenir le code numérique correspondant
+au nom symbolique en paramètre. Elle accepte donc un seul paramètre.
+Pourquoi voulez-vous envoyer plusieurs paramètres ? Si vous avez
+besoin de convertir le nom de plusieurs caractères, utilisez
+une boucle ou un C<map>.
+
+=back
+

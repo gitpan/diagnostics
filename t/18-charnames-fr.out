@@ -1,0 +1,5 @@
+    (use charnames requiert une liste d'importation)
+    Le module de pragma  charnames n'importe rien par
+    défaut. Vous devez spécifier au moins un nom de caractères
+    pour pouvoir l'utiliser.
+    

@@ -1,0 +1,13 @@
+Empty compile time value given to use lib at t/20-coreandmod.pl line 5 (#1)
+    The parameter you provided was an empty string. Maybe you used a variable,
+    but this variable is initialized at run time, yet the module needs it
+    at compile time. You should initialize it within a BEGIN block.
+    
+    (Valeur vide transmise à lib au moment de la compilation)
+    Le paramètre que vous avez envoyé à lib est une chaîne vide.
+    Peut-être avez-vous envoyé une variable, mais cette variable
+    est initialisée à la phase d'exécution, alors que le module en
+    a besoin à la phase de compilation. Vous devriez l'initialiser
+    dans un bloc BEGIN.
+    
+Empty compile time value given to use lib at t/20-coreandmod.pl line 5

@@ -1,0 +1,4 @@
+    The charnames pragmatic module does not import anything
+    by default. You must specify at least one script name, or
+    the special labels :full or :short.
+    

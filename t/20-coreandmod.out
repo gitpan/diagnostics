@@ -1,0 +1,26 @@
+    [lib]
+    The parameter you provided was an empty string. Maybe you used a variable,
+    but this variable is initialized at run time, yet the module needs it
+    at compile time. You should initialize it within a BEGIN block.
+    
+    [lib]
+    (Valeur vide transmise à lib au moment de la compilation)
+    Le paramètre que vous avez envoyé à lib est une chaîne vide.
+    Peut-être avez-vous envoyé une variable, mais cette variable
+    est initialisée à la phase d'exécution, alors que le module en
+    a besoin à la phase de compilation. Vous devriez l'initialiser
+    dans un bloc BEGIN.
+    
+    [perl]
+    (W once) Typographical errors often show up as unique variable names.
+    If you had a good reason for having a unique name, then just mention it
+    again somehow to suppress the message.  The our declaration is
+    provided for this purpose.
+    
+    [perl]
+    (Nom « %s::%s » utilisé une seule fois : faute de frappe
+    possible) (W once) Les fautes de frappe apparaissent fréquemment sous
+    la forme de noms de variable uniques. Si vous avez une bonne raison
+    pour cela, vous n'avez qu'à mentionner la variable à nouveau pour
+    supprimer ce message. La déclaration our est destinée à cela. 
+

@@ -1,0 +1,39 @@
+=head1 DESCRIPTION
+
+=over 4
+
+=for diagnostics
+start items
+
+=item from undefined
+
+(Argument « à partir de » indéfini) Le nom du premier fichier a une
+valeur indéfinie.
+
+=item to undefined
+
+(Argument « vers » indéfini) Le nom du deuxième fichier a une
+valeur indéfinie.
+
+=item Third arg to compare_text() function must be a code reference
+
+(Le troisième argument de C<compare_text> doit être une référence
+de code) Si la comparaison standard de chaîne ne convient pas à
+vos besoins, vous pouvez envoyer la référence d'une routine
+à la fonction C<compare_text>. Or il se trouve que vous avez
+envoyé autre chose. Vérifiez votre programme.
+
+=item Usage: compare( file1, file2 [, buffersize])
+
+(Utilisation : C<compare( fichier1, fichier2 [, taille_buffer])>) Vous devez
+appeler la fonction C<compare> avec deux noms de fichiers ou deux
+handles de fichier, et éventuellement une taille de buffer.
+
+=item Usage: compare_text( file1, file2 [, cmp-function])
+
+(Utilisation : C<compare_text( fichier1, fichier2 [, fct_de_comp])>) Vous devez
+appeler la fonction C<compare_text> avec deux noms de fichiers ou deux
+handles de fichier, et éventuellement la référence à une fonction de
+comparaison.
+
+=back

@@ -1,0 +1,32 @@
+=head1 DESCRIPTION
+
+=over 4
+
+=for diagnostics
+start items
+
+=item from undefined
+
+The first file name you sent to the comparison function was undefined.
+
+=item to undefined
+
+The second file name you sent to the comparison function was undefined.
+
+=item Third arg to compare_text() function must be a code reference
+
+If the standard string comparison does not match your needs, you can
+provide a code reference as a third argument to the C<compare_text> function.
+You provided something else. Check your program.
+
+=item Usage: compare( file1, file2 [, buffersize])
+
+You must call the C<compare> function with two file names or two filehandles,
+and optionally a buffer size.
+
+=item Usage: compare_text( file1, file2 [, cmp-function])
+
+You must call the C<compare_text> function with two file names or two filehandles,
+and optionally a comparison function.
+
+=back

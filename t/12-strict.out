@@ -1,0 +1,6 @@
+    (F) You've said "use strict vars", which indicates that all variables
+    must either be lexically scoped (using "my"), declared beforehand using
+    "our", or explicitly qualified to say which package the global variable
+    is in (using "::").
+
+    (F) The final summary message when a Perl compilation fails.

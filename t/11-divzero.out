@@ -1,0 +1,3 @@
+    (F) You tried to divide a number by 0.  Either something was wrong in
+    your logic, or you need to put a conditional in to guard against
+    meaningless input.

@@ -1,0 +1,30 @@
+=for diagnostics
+start description
+
+=head1 DESCRIPTION
+
+Voici les messages d'erreur qui peuvent provenir du module
+pragmatique C<lib>.
+
+=over 4
+
+=for diagnostics
+start items
+
+=item Empty compile time value given to use lib
+
+(Valeur vide transmise à C<lib> au moment de la compilation)
+Le paramètre que vous avez envoyé à C<lib> est une chaîne vide.
+Peut-être avez-vous envoyé une variable, mais cette variable
+est initialisée à la phase d'exécution, alors que le module en
+a besoin à la phase de compilation. Vous devriez l'initialiser
+dans un bloc C<BEGIN>.
+
+=item Parameter to use lib must be directory, not file
+
+(Le paramètre pour C<use lib> doit être un répertoire, pas un fichier)
+Le pragma C<lib> sert à indiquer à  C<perl> les répertoires où il peut trouver les
+modules. Si vous souhaitez lui indiquer un fichier en particulier, et
+non pas un répertoire, pourquoi ne pas coder C<use> I<fichier> ?
+
+=back

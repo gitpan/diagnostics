@@ -1,0 +1,18 @@
+Name "main::BOGUS2" used only once: possible typo at t/21-enable.pl line 8 (#1)
+    (W once) Typographical errors often show up as unique variable names.
+    If you had a good reason for having a unique name, then just mention it
+    again somehow to suppress the message.  The our declaration is
+    provided for this purpose.
+    
+Name "main::BOGUS3" used only once: possible typo at t/21-enable.pl line 13 (#1)
+Name "main::BOGUS4" used only once: possible typo at t/21-enable.pl line 18 (#1)
+Name "main::BOGUS1" used only once: possible typo at t/21-enable.pl line 3 (#1)
+
+print() on unopened filehandle BOGUS1 at t/21-enable.pl line 3 (#2)
+    (W unopened) An I/O operation was attempted on a filehandle that was
+    never initialized.  You need to do an open(), a sysopen(), or a socket()
+    call, or call a constructor from the FileHandle package.
+    
+print() on unopened filehandle BOGUS2 at t/21-enable.pl line 8.
+print() on unopened filehandle BOGUS3 at t/21-enable.pl line 13 (#2)
+print() on unopened filehandle BOGUS4 at t/21-enable.pl line 18.

@@ -1,0 +1,34 @@
+Name "main::x" used only once: possible typo at t/22-diagfile.pl line 3 (#1)
+    [./dummy.txt]
+    This is a dummy message for the used only once warning.
+    [perl]
+    (W once) Typographical errors often show up as unique variable names.
+    If you had a good reason for having a unique name, then just mention it
+    again somehow to suppress the message.  The our declaration is
+    provided for this purpose.
+    
+Use of uninitialized value in division (/) at t/22-diagfile.pl line 3 (#2)
+    [perl]
+    (W uninitialized) An undefined value was used as if it were already
+    defined.  It was interpreted as a "" or a 0, but maybe it was a mistake.
+    To suppress this warning assign a defined value to your variables.
+    
+    To help you figure out what was undefined, perl tells you what operation
+    you used the undefined value in.  Note, however, that perl optimizes your
+    program and the operation displayed in the warning may not necessarily
+    appear literally in your program.  For example, "that $foo" is
+    usually optimized into "that " . $foo, and the warning will refer to
+    the concatenation (.) operator, even though there is no . in your
+    program.
+    
+Illegal division by zero at t/22-diagfile.pl line 3 (#3)
+    [./dummy.txt]
+    This is a dummy message for the division by zero.
+    
+    [perl]
+    (F) You tried to divide a number by 0.  Either something was wrong in
+    your logic, or you need to put a conditional in to guard against
+    meaningless input.
+    
+Uncaught exception from user code:
+	Illegal division by zero at t/22-diagfile.pl line 3.

@@ -1,0 +1,56 @@
+=for diagnostics
+start description
+
+=head1 CHARNAMES DIAGNOSTICS
+
+These are the diagnostics that can be triggered by the
+C<charnames> pragmatic module
+
+=over 4
+
+=for diagnostics
+start items
+
+=item Unknown charname '%s'
+
+The character name you specified is not a valid one. Please
+refer to the Unicode database.
+
+=item Character 0x%s with name '%s' is above 0xFF
+
+When the C<bytes> pragma is in effect, you cannot use
+a character above 0xFF. 
+
+=item `use charnames' needs explicit imports list
+
+The C<charnames> pragmatic module does not import anything
+by default. You must specify at least one script name, or
+the special labels C<:full> or C<:short>.
+
+=item charnames::viacode() expects one numeric argument
+
+The C<charnames::viacode()> function converts a numeric code into
+a symbolic character name. Therefore, it uses only one argument,
+and this arg must be numeric. Why send an alphabetic arg, or
+more than one arg? If you want to convert several code points,
+use a loop or a C<map>.
+
+=item unexpected arg \"%s\" to charnames::viacode()
+
+To be completed
+
+=item Unicode characters only allocated up to 0x10FFFF (you asked for %s)";
+
+The current version of the Unicode Standard defines character points
+up to code point C<0x10FFFF>. Higher numbers correspond to no
+characters.
+
+=item charnames::vianame() expects one name argument
+
+The C<charnames::vianame()> function converts a symbolic character
+name into a numeric code. Therefore, it uses only one argument. Why
+send more than one arg? If you want to convert several character
+names, use a loop or a C<map>.
+
+=back
+

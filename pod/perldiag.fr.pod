@@ -1,0 +1,6 @@
+=head1 DESCRIPTION
+
+Contenu pipeau, qui va être écrasé par C<make>. L'essentiel est que le
+fichier existe au moment du C<perl Makefile.PL>.  En effet, MakeMaker
+ne peut pas deviner à ce moment-là que F<perldiag.fr.pod.PL> va 
+créer F<perldiag.fr.pod>, lequel doit être installé par C<make install>.

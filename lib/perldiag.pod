@@ -1,0 +1,26 @@
+=for diagnostics
+start decription
+
+=head1 LIB MODULE
+
+These are the error messages that can appear when using the C<lib> 
+pragmatic module.
+
+=over 4
+
+=for diagnostics
+start items
+
+=item Empty compile time value given to use lib
+
+The parameter you provided was an empty string. Maybe you used a variable,
+but this variable is initialized at run time, yet the module needs it
+at compile time. You should initialize it within a C<BEGIN> block.
+
+=item Parameter to use lib must be directory, not file
+
+The C<lib> pragme informs C<perl> that it  can find modules
+in a particular directory. If you want to indicate a specific
+file, why not code C<use> I<file>?
+
+=back
