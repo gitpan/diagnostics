@@ -1,0 +1,281 @@
+How to make your module compatible with diagnostics-1.2?
+
+
+
+BEST CASE, THE DESCRIPTIONS ALREADY EXIST
+
+-----------------------------------------
+
+
+
+For some modules, the inline POD documentation already contains
+
+a chapter giving the list of error messages, with an explanation.
+
+You just have to insert a start tag and a stop tag, and check the
+
+generic error messages (that is, with a variable part).
+
+
+
+Here is an real-life example, from the overload.pm module.
+
+
+
+----------------- example begins ---------------------
+
+=head1 DIAGNOSTICS
+
+
+
+When Perl is run with the B<-Do> switch or its equivalent, overloading
+
+induces diagnostic messages.
+
+[ cut para for brevity's sake]
+
+The module might issue the following warnings:
+
+
+
+=over 4
+
+
+
+=item Odd number of arguments for overload::constant
+
+
+
+(W) The call to overload::constant contained an odd number of arguments.
+
+The arguments should come in pairs.
+
+
+
+=item `%s' is not an overloadable type
+
+
+
+(W) You tried to overload a constant type the overload package is unaware of.
+
+
+
+=item `%s' is not a code reference
+
+
+
+(W) The second (fourth, sixth, ...) argument of overload::constant needs
+
+to be a code reference. Either an anonymous subroutine, or a reference
+
+to a subroutine.
+
+
+
+=back
+
+------------------ example ends ----------------------
+
+In this case, the only thing to do is insert a start tag for the
+
+presentation (which will be available through the -verbose flag),
+
+another one for the messages, and the corresponding end flags.
+
+
+
+The result is:
+
+----------------- example begins ---------------------
+
+=head1 DIAGNOSTICS
+
+
+
+=for diagnostics
+
+start description
+
+
+
+When Perl is run with the B<-Do> switch or its equivalent, overloading
+
+induces diagnostic messages.
+
+[ cut para for brevity's sake]
+
+
+
+=for diagnostics
+
+stop
+
+
+
+The module might issue the following warnings:
+
+
+
+=over 4
+
+
+
+=for diagnostics
+
+start items
+
+
+
+=item Odd number of arguments for overload::constant
+
+
+
+(W) The call to overload::constant contained an odd number of arguments.
+
+The arguments should come in pairs.
+
+
+
+=item `%s' is not an overloadable type
+
+
+
+(W) You tried to overload a constant type the overload package is unaware of.
+
+
+
+=item `%s' is not a code reference
+
+
+
+(W) The second (fourth, sixth, ...) argument of overload::constant needs
+
+to be a code reference. Either an anonymous subroutine, or a reference
+
+to a subroutine.
+
+
+
+=for diagnostics
+
+stop
+
+
+
+=back
+
+------------------ example ends ----------------------
+
+That's all!
+
+
+
+In this case, the generic messages have only printf-like specifiers, no 
+
+Perl-like variable interpolation, so there was nothing to change.
+
+
+
+If the message includes interpolated variables, they must be replaced 
+
+by printf-like specifiers. E.g.
+
+
+
+=item The '$parm' parameter must be in the $lo..$hi range
+
+
+
+would be replaced by
+
+
+
+=item The '%s' parameter must be in the %d..%d range
+
+
+
+NOT SO GOOD, THE EXPLANATIONS DO NOT EXIST
+
+------------------------------------------
+
+
+
+If the pod documentation does not contain the error messages and
+
+their explanations, well... you have to type them (that is, if you
+
+think explanations will help your users; if you don't think so, don't bother
+
+about it). Use the same format as perldiag.pod and overload.pm, and
+
+include the start and stop tags.
+
+
+
+SPECIAL CASE, THE % CHARACTER
+
+-----------------------------
+
+
+
+This character must be handled specially because it is the prefix for
+
+printf specifiers.  Depending on the characters following the %, you
+
+may have to double it.  In other cases, no confusion can arise, so you
+
+can use a single % char, for example, if the error message refers to
+
+%ENV.
+
+
+
+If you double the % character (either you have to, or you choose to do so),
+
+it may puzzle a (rather dumb) user. If you do not, the message
+
+would be reported by the -debug=128 option, whose purpose is to check
+
+that all printf specifiers are correctly dealt with by the diagnostics.pm
+
+module. So this debug option reports all the % character that are not accounted
+
+for. But if a user that uses this option is a user bright enough
+
+to look under the hood of my (and your) module, and to recognize
+
+a false positive when seeing one.
+
+
+
+SPECIAL CASE, THE \377 CHARACTER
+
+--------------------------------
+
+
+
+The lingua franca on CPAN (and most computer-related activities) is English.
+
+So, you should normally code and document your module in English. Therefore,
+
+your error messages will contain 7-bit ASCII only.
+
+
+
+Yet, there are a few modules that are useful to a single
+
+community. Most notably, there are Cz:: and No:: modules, which
+
+include error messages and documentation in Czech and Norwegian. So,
+
+the error messages may contain ISO-8859-n characters.
+
+
+
+The problem is, the \377 char (y with umlaut) has a special role in 
+
+diagnostics.pm. So, you should either rephrase your error message and
+
+use words that do not contain this letter, or replace it by %c.
+
+

@@ -8,9 +8,12 @@ my %script = ('11-divzero' => 'Runtime error, with English text'
 	   ,  '18-charnames-fr'  => 'Carp from a module, French text'
 	   ,  '19-charnames-bil' => 'Carp from a module, bilingual'
 	   ,  '20-coreandmod'    => 'Warn from the core and carp from a module'
-	   ,  '21-enable'        => 'Enabling and disabling descriptions'
-	   ,  '22-diagfile'      => 'Specific file'
+	   ,  '21-enable'        => 'Enabling and disabling descriptions (not 560)'
+	   ,  '21a-enable'       => 'Enabling and disabling descriptions (560 only)'
+	   ,  '22-diagfile'      => 'Specific file (not 560)'
+	   ,  '22a-diagfile'     => 'Specific file (560 only)'
 	   ,  '23-percent-g'     => 'Error with %g specifier'
+	   ,  '24-eval'          => 'die within an eval, no output'
 	   );
 my @script = sort keys %script;
 
@@ -20,7 +23,17 @@ foreach (@script)
   {
     ++$i;
     my @tstlines;
-    if ($^O =~ /Win32/)
+    if ($^V eq v5.6.0 && $script{$_} =~ /not 560/)
+      {
+        print "ok # skipped (explanations have changed since 5.6.0)\n";
+        next;
+      }
+    elsif ($^V ne v5.6.0 && $script{$_} =~ /560 only/)
+      {
+        print "ok # skipped (explanations were different in 5.6.0)\n";
+        next;
+      }
+    elsif ($^O =~ /Win32/)
       {
         # cmd.exe sucks!
         my @result = capture("perl -Mblib t/$_.pl", "", "");

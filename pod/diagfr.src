@@ -12,29 +12,20 @@ pas besoin d'une version 8 ni, a fortiori, d'une version 9. J'ai tiré
 parti de ce fait pour utiliser le numéro de version 999 pour
 introduire des commentaires dans le présent fichier.
 #endif
-
+#if defined(perldiag560)
 =for diagnostics
 start description
 
-#if defined(perldiag560)
 =head1 Messages de diagnostic
 
 Ces messages sont classés dans un ordre croissant de désespoir :
 
-  B<Classe> B<Signification>
-
   (W) Un avertissement (optionnel)
-
   (D) Une dépréciation (optionnelle)
-
   (S) Un avertissement sérieux (obligatoire)
-
   (F) Une erreur fatale (interceptable)
-
   (P) Une erreur interne (panique) que vous ne devriez jamais rencontrer (interceptable)
-
   (X) Une erreur extrêmement fatale (non-interceptable)
-
   (A) Une erreur venue de l'au-delà (non générée par Perl)
 
 La plupart des messages des trois premières classifications ci-dessus
@@ -80,26 +71,25 @@ alphabétiques servent pour trier les messages.
 
 =over 4
 
+
+=for diagnostics
+start items
+
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
+=for diagnostics
+start description
+
 =head1 DESCRIPTION
 
 Ces messages sont classés dans un ordre croissant de désespoir :
 
-  B<Classe> B<Signification>
-
   (W) Un avertissement (optionnel)
-
   (D) Une dépréciation (optionnelle)
-
   (S) Un avertissement sérieux (obligatoire)
-
   (F) Une erreur fatale (interceptable)
-
   (P) Une erreur interne (panique) que vous ne devriez jamais rencontrer (interceptable)
-
   (X) Une erreur extrêmement fatale (non-interceptable)
-
   (A) Une erreur venue de l'au-delà (non générée par Perl)
 
 La plupart des messages des trois premières classifications ci-dessus
@@ -142,11 +132,11 @@ donnons ici une traduction pour en faciliter la compréhension.
 
 =over 4
 
-#endif
 
 =for diagnostics
 start items
 
+#endif
 =item accept() on closed socket %s
 
 (C<accept()> sur une socket fermée I<%s>) (W closed) Vous avez tenté
@@ -184,7 +174,7 @@ préfixe C<CORE::> sur cet opérateur (ex. C<CORE::log($x)>)
 ou déclarez le sous-programme en tant que méthode objet.
 (Cf. L<perlsub/"Subroutine Attributes"> ou L<attributes>).
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Ambiguous range in transliteration operator
 
 (Intervalle ambigu dans l'opérateur de translation) (F) Vous avez
@@ -231,6 +221,21 @@ standard en deux flux, comme dans :
   }
   close SORTIE;
 
+#if defined(perldiag580) or defined(perldiag573)
+=item Applying %s to %s will act on scalar(%s)
+
+(Appliquer I<%s> à I<%s> fonctionne avec C<scalar(>I<%s>C<)>) (W misc)
+Les opérateurs de recherche de correspondance (C<//>), de substitution
+(C<s///>) et de translation (C<tr///>) fonctionnent avec des valeurs
+scalaires. Si vous appliquez l'un d'eux à un tableau ou à un hachage,
+il convertit ce dernier en une valeur scalaire --- la longueur du
+tableau ou les informations sur le peuplement du hachage --- puis
+travaille sur la valeur scalaire. Ce n'est probablement pas ce que
+vous vouliez faire. Cf. L<perlfunc/grep> et L<perlfunc/map> pour
+d'autres possibilités.
+
+#endif
+#if defined(perldiag561) or defined(perldiag560)
 =item Applying %s to %s will act on scalar(%s)
 
 (Appliquer I<%s> à I<%s> fonctionne avec un scalaire (I<%s>)) (W misc)
@@ -243,6 +248,7 @@ travaille sur la valeur scalaire. Ce n'est probablement pas ce que
 vous vouliez faire. Cf. L<perlfunc/grep> and L<perlfunc/map> for
 alternatives.
 
+#endif
 =item Args must match #! line
 
 (Les arguments doivent correspondre à la ligne C<#!>) (F) L'émulateur
@@ -318,6 +324,28 @@ arguments doivent soit être tous les deux des scalaires, soit tous
 les deux des listes. Autrement Perl ne connaît pas le contexte à
 fournir au côté droit. 
 
+#if defined(perldiag580)
+=item A thread exited while %d other threads were still running
+
+(Un thread a effectué un C<exit> alors que I<%d> autres threads
+tournaient encore) (W) Lors de l'utilisation d'un Perl avec
+threads, un thread (pas forcément le thread principal) a effectué
+un C<exit> alors que d'autres threads continuaient à
+s'exécuter. D'habitude, il est de bon ton de commencer par
+recueillir par C<join> les valeurs de retour de tous les threads,
+et ensuite seulement d'arrêter le thread principal avec
+C<exit>. Cf. L<threads>.
+
+#endif
+#if defined(perldiag580)
+=item Attempt to access disallowed key '%s' in a restricted hash
+
+(Tentative d'accéder à la clé « I<%s> » interdite dans un hachage
+restreint) (F) Le code en erreur a tenté de lire ou de mettre à
+jour une clé qui ne figure pas dans l'ensemble des valeurs de clé
+autorisées pour le hachage restreint.
+
+#endif
 #if defined(perldiag573)
 =item Attempt to access key '%_' in fixed hash
 
@@ -328,7 +356,7 @@ avec un ensemble fixé de clés. Le code en cause a essayé de lire ou de mettre
 de détruire une clé.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Attempt to bless into a reference
 
 (Tentative de consacrer dans une référence) (F) L'opérateur C<bless> s'attend à ce
@@ -341,10 +369,39 @@ alors que vous vouliez dire
 
     bless $self, ref($proto) || $proto;
 
-Si vous voulez réellement consacrer l'objet dans la version convertie en chaîne
-de la référence fournie, vous devez la convertir vous-même, en écrivant par exemple :
+Si vous voulez réellement consacrer l'objet dans la version
+convertie en chaîne de la référence fournie, vous devez la
+convertir vous-même, en écrivant par exemple :
 
     bless $self, "$proto";
+
+#endif
+#if defined(perldiag580)
+=item Attempt to clear a restricted hash
+
+(Tentative de réinitialisation d'un hachage restreint) (F) Pour l'instant,
+il est interdit de nettoyer un hachage restreint, même si c'est pour
+lui attribuer ensuite les mêmes clés que précédemment. C'est susceptible
+de changer à l'avenir.
+
+#endif
+#if defined(perldiag580)
+=item Attempt to delete disallowed key '%s' from a restricted hash
+
+(Tentative de destruction d'une clé interdite « I<%s> » dans un
+hachage restreint) (F) Le code en erreur a essayé de supprimer
+une clé d'un hachage restreint, alors que cette clé ne figure pas
+dans l'ensemble des valeurs de clé autorisées pour le hachage
+restreint.
+
+#endif
+#if defined(perldiag580)
+=item Attempt to delete readonly key '%s' from a restricted hash
+
+(Tentative de destruction d'une clé en lecture seule « I<%s> »
+dans un hachage restreint) (F) Le code en erreur a essayé de
+supprimer une clé d'un hachage restreint, alors que cette clé
+était déclarée en lecture seule.
 
 #endif
 =item Attempt to free non-arena SV: 0x%lx
@@ -379,6 +436,7 @@ elle tentera de le faire.
 internal) Le compteur de références a été endommagé en ce qui
 concerne les alias de symboles. 
 
+#if defined(perldiag561) or defined(perldiag560)
 =item Attempt to free unreferenced scalar
 
 (Tentative de libérer un scalaire non référencé) (W internal) Perl
@@ -391,6 +449,21 @@ pas été appelé assez de fois ou encore que le SV a été achevé
 (I<mortalized>) alors qu'il n'aurait pas dû l'être ou enfin que la
 mémoire a été corrompue. 
 
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Attempt to free unreferenced scalar
+
+(Tentative de libérer un scalaire non référencé) (W internal) Perl
+allait décrémenter un compteur de références d'un scalaire pour voir
+s'il arrivait à 0 et a découvert qu'il était déjà arrivé à 0
+auparavant et qu'il se pourrait qu'il ait été libéré et, en fait,
+qu'il a probablement été libéré. Cela peut indiquer que
+C<SvREFCNT_dec> a été appelé trop souvent ou que C<SvREFCNT_inc> n'a
+pas été appelé assez souvent ou encore que le SV a été achevé
+(I<mortalized>) alors qu'il n'aurait pas dû l'être ou enfin que la
+mémoire a été corrompue. 
+
+#endif
 =item Attempt to join self
 
 (Tentative de se rejoindre soi-même) (F) Vous avez essayer de
@@ -427,7 +500,7 @@ respectivement C<sizeof(struct msqid_ds *)>, C<sizeof(struct semid_ds
 *)> et C<sizeof(struct shmid_ds *)>. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Bad arg length for %s, is %d, should be %s
 
 (Mauvaise longueur d'argument pour I<%s>, vaut I<%d>, devrait valoir
@@ -452,21 +525,6 @@ n'a aucun handle de fichier qui lui soit associé. Peut-être avez-vous
 oublié de faire un C<open> ou dans vous l'avez fait dans un autre
 paquetage. 
 
-#if defined(perldiag573)
-=item Bad free() ignored
-
-(Mauvais C<free()> ignoré) (S malloc) Une routine interne a appelé
-C<free> sur quelque chose qui n'avait jamais été alloué avec
-C<malloc> dans un premier temps. Ce message est obligatoire mais peut
-être désactivé en positionnant la variable d'environnement
-C<PERL_BADFREE> à 0.
-
-Ce message peut être assez fréquent avec C<DB_file> sur les systèmes
-avec une édition de liens dynamiques « en dur », comme AIX et OS/2.
-C'est un bug de Berkeley DB, que l'on ne remarque pas si C<DB> utilise
-un C<malloc> compréhensif.
-
-#endif
 #if defined(perldiag560)
 =item Bad free() ignored
 
@@ -479,6 +537,21 @@ C<PERL_BADFREE> à 1.
 Ce message peut être assez fréquent avec C<DB_file> sur les systèmes
 avec une édition de liens dynamiques en « dur », comme AIX et OS/2.
 C'est un bug de Berkeley DB.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Bad free() ignored
+
+(Mauvais C<free()> ignoré) (S malloc) Une routine interne a appelé
+C<free> sur quelque chose qui n'avait jamais été alloué avec
+C<malloc> dans un premier temps. Ce message est obligatoire mais peut
+être désactivé en positionnant la variable d'environnement
+C<PERL_BADFREE> à 0.
+
+Ce message peut être assez fréquent avec C<DB_file> sur les systèmes
+avec une édition de liens dynamiques « en dur », comme AIX et OS/2.
+C'est un bug de Berkeley DB, que l'on ne remarque pas si C<DB> utilise
+un C<malloc> compréhensif.
 
 #endif
 =item Bad hash
@@ -616,7 +689,7 @@ faire un C<bind> sur une socket fermée. Peut-être avez-vous oublié de
 vérifier la valeur renvoyée par l'appel de C<socket> ? 
 Cf. L<perlfunc/bind>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item binmode() on closed filehandle %s
 
 (C<binmode()> sur le handle de fichier fermé %s) (W unopened) Vous
@@ -791,21 +864,21 @@ la table des symboles (typeglobs) à cesser d'être ce qu'ils sont.
 d'une erreur spécifique à VMS. Le processus souffre de quotas
 dépassés ou d'autres problèmes de plomberie. 
 
-#if defined(perldiag573)
-=item Can't declare class for non-scalar %s in "%s"
-
-(Impossible de déclarer une classe pour le non-scalaire I<%s> dans 
-« I<%s> ») (F) Actuellement, seules les variables scalaires peuvent
-être déclarée avec un qualificateur de classe spécifique dans une
-déclaration C<my> ou C<our>. Les sémantiques peuvent être étendues à
-d'autres types de variables à l'avenir. 
-
-#endif
 #if defined(perldiag561) or defined(perldiag560)
 =item Can't declare class for non-scalar %s in "%s"
 
 (Impossible de déclarer une classe pour le non-scalaire I<%s> dans 
 « I<%s> ») (S) Actuellement, seules les variables scalaires peuvent
+être déclarée avec un qualificateur de classe spécifique dans une
+déclaration C<my> ou C<our>. Les sémantiques peuvent être étendues à
+d'autres types de variables à l'avenir. 
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Can't declare class for non-scalar %s in "%s"
+
+(Impossible de déclarer une classe pour le non-scalaire I<%s> dans 
+« I<%s> ») (F) Actuellement, seules les variables scalaires peuvent
 être déclarée avec un qualificateur de classe spécifique dans une
 déclaration C<my> ou C<our>. Les sémantiques peuvent être étendues à
 d'autres types de variables à l'avenir. 
@@ -845,6 +918,15 @@ fichiers plus longs que 14 caractères et Perl n'a pas pu créer un nom
 de fichier unique durant l'édition sur place avec l'option B<-i>. Ce
 fichier a été ignoré. 
 
+#if defined(perldiag560)
+=item Can't do {n,m} with n > m
+
+(Impossible de faire C<{n,m}> avec C<n> > C<m>) (F) Les minima
+doivent être inférieurs ou égaux aux maxima. Si vous voulez vraiment
+que votre expression régulière corresponde 0 fois, faites juste
+C<{0}>. 
+
+#endif
 #if defined(perldiag561)
 =item Can't do {n,m} with n > m before << HERE in regex m/%s/
 
@@ -855,16 +937,7 @@ C<{0}>. Le marqueur « HERE » montre l'endroit dans l'expression
 régulière où le problème a été constaté. Cf. L<perlre>.
 
 #endif
-#if defined(perldiag560)
-=item Can't do {n,m} with n > m
-
-(Impossible de faire C<{n,m}> avec C<n> > C<m>) (F) Les minima
-doivent être inférieurs ou égaux aux maxima. Si vous voulez vraiment
-que votre expression régulière corresponde 0 fois, faites juste
-C<{0}>. 
-
-#endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Can't do {n,m} with n > m in regex; marked by <-- HERE in m/%s/
 
 (Impossible de faire C<{n,m}> avec C<n> > C<m>) (F) Les minima doivent
@@ -938,7 +1011,7 @@ pas les bonnes permissions.
 chaîne de la forme C<CORE::>I<mot> a été donnée à C<prototype>
 mais il n'existe pas de fonction interne nommée I<mot>. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Can't find %s character property "%s"
 
 (Impossible de trouver la propriété de caractères « %s ») (F)
@@ -969,7 +1042,7 @@ exécuter ne peut être trouvé dans le C<PATH> ou tout au moins pas avec
 des permissions correctes. Le script existe dans le répertoire
 courant, mais le C<PATH> l'empêche de se lancer. 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Can't find %s property definition %s
 
 (Définition de la propriété I<%s> introuvable) (F) Vous avez peut-être
@@ -980,6 +1053,18 @@ C<\p>, soit par C<\\p> (ce qui ne protège que C<\p>), soit par C<\Q\p>
 échéant).
 
 #endif
+#if defined(perldiag580)
+=item Can't find %s property definition %s
+
+(F) You may have tried to use C<\p> which means a Unicode property (for
+example C<\p{Lu}> is all uppercase letters).  If you did mean to use a
+Unicode property, see L<perlunicode> for the list of known properties.
+If you didn't mean to use a Unicode property, escape the C<\p>, either
+by C<\\p> (just the C<\p>) or by C<\Q\p> (the rest of the string, until
+possible C<\E>).
+
+#endif
+#if defined(perldiag573) or defined(perldiag561) or defined(perldiag560)
 =item Can't find string terminator %s anywhere before EOF
 
 (Impossible de trouver la fin de la chaîne I<%s> quelque part avant
@@ -997,6 +1082,7 @@ blancs invisibles avant ou après la marque de fermeture. Un bon
 éditeur pour les programmeurs devrait pouvoir vous aider à trouver
 ces caractères.
 
+#endif
 =item Can't fork
 
 (C<fork> impossible)(F) Une erreur fatale est survenue en essayant de
@@ -1156,6 +1242,13 @@ de base. Cf. L<perlobj>.
 (W syntax) Le tableau C<@ISA> contient le nom d'un autre paquetage
 qui semble ne pas exister. 
 
+#if defined(perldiag580)
+=item Can't locate PerlIO%s
+
+(F) You tried to use in open() a PerlIO layer that does not exist,
+e.g. open(FH, ">:nosuchlayer", "somefile").
+
+#endif
 =item Can't make list assignment to \%ENV on this system
 
 (Impossible d'assigner une liste à C<\%ENV> sur ce système) (F)
@@ -1206,6 +1299,19 @@ explicitement, a échoué à cause de la raison indiquée. Habituellement
 c'est parce que vous n'avez pas les permissions en lecture sur le
 fichier que vous avez indiqué sur la ligne de commande. 
 
+#if defined(perldiag580)
+=item Can't open a reference
+
+(Impossible d'ouvrir une référence) (W io) Vous avez essayé d'ouvrir
+une référence scalaire en lecture ou en écriture, avec la syntaxe
+d'C<open> à 3 arguments :
+
+    open FH, '>', $ref;
+
+mais votre version de perl est compilée sans C<perlio>, et cette forme
+d'C<open> n'est pas supportée.
+
+#endif
 =item Can't open bidirectional pipe
 
 (Impossible d'ouvrir un pipe bidirectionnel) (W pipe) Vous avez
@@ -1252,7 +1358,7 @@ les données destinées à C<STDOUT>.
 que vous avez spécifié ne peut être ouvert pour la raison indiquée. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Can't open perl script%s: %s
 
 (Impossible d'ouvrir le script perl « I<%s> » : I<%s>) (F) Le script
@@ -1340,7 +1446,7 @@ L'instruction C<return> a été exécutée dans le fil principal du code,
 c'est-à-dire là où il n'y a aucun appel de sous-programme dont on
 peut revenir avec C<return>. Cf. L<perlsub>.
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Can't return %s to lvalue scalar context
 
 (Impossible de renvoyer I<%s> pour un contexte scalaire de lvalue) (F)
@@ -1409,7 +1515,7 @@ conversion a été tentée.
 représente le niveau zéro de l'évolutivité. L'évolution vers C<undef>
 indique une erreur dans le code appelant C<sv_upgrade>. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Can't use anonymous symbol table for method lookup
 
 (Impossible d'utiliser une table de symboles anonyme pour la recherche
@@ -1432,7 +1538,7 @@ I<%s> pendant que « C<strict refs> » est actif) (F) Les références en
 dur sont les seules autorisées par C<strict refs>. Les références
 symboliques sont interdites. 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Can't use %! because Errno.pm is not available
 
 (Impossible d'utiliser C<%!> car C<Errno.pm> est indisponible) (F)
@@ -1569,7 +1675,7 @@ anti-slash : C<\[=> et C<=\]>.
 syntaxe pour une classe de caractères C<[: :]> est inconnue. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Character in "C" format wrapped
 
 (Caractère réduit dans un format « C ») (W pack) Vous avez écrit
@@ -1587,7 +1693,7 @@ Si vous voulez réellement utiliser des caractères Unicode, utilisez le
 format C<"U"> à la place.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Character in "c" format wrapped
 
 (Caractère réduit dans un format « c ») (W pack) Vous avez écrit
@@ -1625,7 +1731,7 @@ faisant débuter par un 0 en Perl, tout comme en C.
 un descripteur de fichier qui n'avait jamais été ouvert. 
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item close() on unopened filehandle %s
 
 (Ferme un  handle de fichier non ouvert I<%s>) (W) Vous avez essayé de fermer
@@ -1662,6 +1768,33 @@ qu'elle soit plus simple ou qu'elle contienne moins de retours
 arrières. (Cf L<perlfaq2> pour des informations à propos de
 I<La maîtrise des Expressions régulières>).
 
+#if defined(perldiag580)
+=item cond_broadcast() called on unlocked variable
+
+(W threads) Within a thread-enabled program, you tried to call
+cond_broadcast() on a variable which wasn't locked. The cond_broadcast()
+function  is used to wake up another thread that is waiting in a
+cond_wait(). To ensure that the signal isn't sent before the other thread
+has a chance to enter the wait, it is usual for the signaling thread to
+first wait for a lock on variable. This lock attempt will only succeed
+after the other thread has entered cond_wait() and thus relinquished the
+lock.
+
+
+#endif
+#if defined(perldiag580)
+=item cond_signal() called on unlocked variable
+
+(W threads) Within a thread-enabled program, you tried to call
+cond_signal() on a variable which wasn't locked. The cond_signal()
+function  is used to wake up another thread that is waiting in a
+cond_wait(). To ensure that the signal isn't sent before the other thread
+has a chance to enter the wait, it is usual for the signaling thread to
+first wait for a lock on variable. This lock attempt will only succeed
+after the other thread has entered cond_wait() and thus relinquished the
+lock.
+
+#endif
 =item connect() on closed socket %s
 
 (C<connect()> sur une socket fermée I<%s>) (W closed) Vous avez essayé
@@ -1669,7 +1802,7 @@ de faire un C<connect> sur une socket fermée. Peut-être avez-vous
 oublié de vérifier la valeur retournée par l'appel de C<socket> ?
 Cf. L<perlfunc/connect>.
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Constant(%s)%s: %s
 
 (C<constant(>I<%s>C<)>I<%s> : I<%s>) (F) L'analyseur syntaxique a trouvé
@@ -1706,6 +1839,15 @@ redéfini un sous-programme qui a été désigné auparavant comme étant en
 ligne (I<inlining>). Cf. L<perlsub/"Constant Functions"> pour des
 commentaires et des solutions de contournement.
 
+#if defined(perldiag580)
+=item Constant subroutine %s redefined
+
+(S) You redefined a subroutine which had previously been
+eligible for inlining.  See L<perlsub/"Constant Functions"> for
+commentary and workarounds.
+
+#endif
+#if defined(perldiag573) or defined(perldiag561) or defined(perldiag560)
 =item Constant subroutine %s undefined
 
 (Sous-programme constant I<%s> indéfini) (W misc) Vous avez rendu
@@ -1713,6 +1855,7 @@ indéfini un sous-programme qui a été désigné auparavant comme étant en
 ligne (I<inlining>).  Cf. L<perlsub/"Constant Functions"> pour des
 commentaires et des solutions de contournement.
 
+#endif
 =item Copy method did not return a reference
 
 (La méthode de copie n'a pas renvoyé de référence) (F) La méthode qui
@@ -1767,19 +1910,19 @@ d'autre.
 
 (C<defined(@tableau)> est déprécié) (D deprecated) C<defined> n'est
 habituellement pas très utile sur les tableaux car il teste la
-présence d'une valeur I<scalaire> indéfinie. Si vous voulez voir si
-le tableau est vide, vous n'avez qu'à utiliser C<if (@tableau) { #
-pas vide }>. 
+présence d'une valeur I<scalaire> indéfinie. Si vous voulez voir si le
+tableau est vide, vous n'avez qu'à utiliser C<if (@tableau) { # pas
+vide }>.
 
 =item defined(%hash) is deprecated
 
 (C<defined(%hachage)> est déprécié) (D deprecated) C<defined> n'est
 habituellement pas très utile sur les hachages car il teste la
-présence d'une valeur I<scalaire> indéfinie. Si vous voulez voir si
-le hachage est vide, vous n'avez qu'à utiliser C<if (%hachage) { #
-pas vide }>. 
+présence d'une valeur I<scalaire> indéfinie. Si vous voulez voir si le
+hachage est vide, vous n'avez qu'à utiliser C<if (%hachage) { # pas
+vide }>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item %s defines neither package nor VERSION--version check failed
 
 (I<%s> ne définit ni paquetage, ni VERSION -- la vérification de la version
@@ -1840,7 +1983,7 @@ C<$_> étaient vides.
 
 (Le document ne contient pas de données) Voir C<Server error>. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item %s does not define %s::VERSION--version check failed
 
 (I<%s> ne définit pas I<%s>C<::VERSION> -- la vérification de la version
@@ -1871,7 +2014,7 @@ encore défini, en fait vous n'avez pas à définir le sous-programme ou
 le paquetage avant cet endroit. Vous pouvez utilisez un C<sub truc;>
 ou un C<package TRUC;> vide pour entrer une déclaration « par avance ». 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item dump() better written as CORE::dump()
 
 (Plutôt que C<dump()>, il est préférable d'écrire C<CORE::dump()> (W misc)
@@ -1893,10 +2036,18 @@ sera interprété comme une tentative d'appel à la méthode nommée
 C<elseif> pour la classe renvoyée par le bloc qui suit. Ce n'est
 sûrement pas ce que vous voulez. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Empty %s
 
 (I<%s> vide) (F) La propriété C<\p{}> ou C<\P{}> est vide.
+
+#endif
+#if defined(perldiag580)
+=item Empty %s
+
+(F) C<\p> and C<\P> are used to introduce a named Unicode property, as
+described in L<perlunicode> and L<perlre>. You used C<\p> or C<\P> in
+a regular expression without specifying the property name.
 
 #endif
 #if defined(perldiag573)
@@ -1960,7 +2111,7 @@ extensions d'une longue liste de fichiers, essayez d'utiliser
 l'opérateur C<glob> ou mettez les noms de fichiers dans une variable
 et faites un C<glob> dessus. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item exec? I'm not *that* kind of operating system
 
 (C<exec> ? Je ne suis pas *ce* système d'exploitation) (F) La fonction
@@ -2037,7 +2188,7 @@ capturée a été levée pendant l'exécution d'un sous-programme
 C<CHECK>, C<INIT> ou C<END>. Le traitement du reste de la file
 contenant de telles routines s'est terminé prématurément. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item False [] range "%s" in regex; marked by <-- HERE in m/%s/
 
 (Faux intervalle C<[]> « I<%s> » dans l'expression régulière) (W
@@ -2094,6 +2245,22 @@ C<< +>> >> au lieu de C<< < >> ou rien du tout. Si vous désiriez
 uniquement écrire dans le fichier, utilisez C<< > >> ou C<< >> >>. 
 Cf. L<perlfunc/open>.
 
+#if defined(perldiag580)
+=item Filehandle %s opened only for input
+
+(W io) You tried to write on a read-only filehandle.  If you intended it
+to be a read-write filehandle, you needed to open it with "+<" or "+>"
+or "+>>" instead of with "<" or nothing.  If you intended only to write
+the file, use ">" or ">>".  See L<perlfunc/open>.
+The warning will also occur if STDOUT (file descriptor 1) or STDERR
+(file descriptor 2) is opened for input, this is a pre-emptive warning in
+case some other part of your program or a child process is expecting STDOUT
+and STDERR to be writable. This can happen accidentally if you
+C<close(STDOUT)> or STDERR and then C<open> an unrelated handle which
+will resuse the lowest numbered available descriptor.
+
+#endif
+#if defined(perldiag573) or defined(perldiag561) or defined(perldiag560)
 =item Filehandle %s opened only for output
 
 (Handle de fichier I<%s> ouvert seulement pour les sorties) (W io)
@@ -2104,6 +2271,23 @@ C<< +>> >> au lieu de C<< < >> ou rien du tout. Si vous désiriez
 uniquement lire dans le fichier, utilisez C<< < >>. 
 Cf. L<perlfunc/open>.
 
+#endif
+#if defined(perldiag580)
+=item Filehandle %s opened only for output
+
+(W io) You tried to read from a filehandle opened only for writing.
+If you intended it to be a read/write filehandle, you needed to open it
+with "+<" or "+>" or "+>>" instead of with "<" or nothing.  If you
+intended only to read from the file, use "<".  See L<perlfunc/open>.
+The warning will also occur if STDIN (file descriptor 0) is opened
+for output - this is a pre-emptive warning in case some other part of your
+program or a child process is expecting STDIN to be readable.
+This can happen accidentally if you C<close(STDIN)> and then C<open> an
+unrelated handle which will resuse the lowest numbered available
+descriptor.
+
+#endif
+#if defined(perldiag573) or defined(perldiag561) or defined(perldiag560)
 =item Final $ should be \$ or $name
 
 (C<$> final devrait être C<\$> ou C<$nom>) (F) Vous devez maintenant
@@ -2112,6 +2296,7 @@ le signe dollar littéral ou s'il était là pour introduire un nom de
 variable s'avérant manquer. Vous devez donc ajouter soit
 l'anti-slash, soit le nom. 
 
+#endif
 =item Final @ should be \@ or @name
 
 (C<@> final devrait être C<\@> ou C<@nom>) (F) Vous devez maintenant
@@ -2143,6 +2328,18 @@ Cf.  L<perlre>.
 contenant uniquement un point. Perl est arrivé en fin de fichier sans
 trouver une telle ligne. 
 
+#if defined(perldiag580) or defined(perldiag573)
+=item Format %s redefined
+
+(Format I<%s> redéfini) (W redefine) Vous avez redéfini un format.
+Pour supprimer cet avertissement, écrivez 
+
+    {
+	no warnings 'redefine';
+	eval "format NAME =...";
+    }
+
+#endif
 #if defined(perldiag561) or defined(perldiag560)
 =item Format %s redefined
 
@@ -2153,18 +2350,6 @@ Pour supprimer cet avertissement, écrivez
       no warnings;
       eval "format NAME =...";
   }
-
-#endif
-#if defined(perldiag573)
-=item Format %s redefined
-
-(Format I<%s> redéfini) (W redefine) Vous avez redéfini un format.
-Pour supprimer cet avertissement, écrivez 
-
-    {
-	no warnings 'redefine';
-	eval "format NAME =...";
-    }
 
 #endif
 =item Found = in conditional, should be ==
@@ -2180,6 +2365,7 @@ alors que vous vouliez dire :
 
 (ou quelque chose de similaire).
 
+#if defined(perldiag561) or defined(perldiag560)
 =item %s found where operator expected
 
 (I<%s> trouvé là où l'on attendait un opérateur) (S) L'analyseur
@@ -2189,6 +2375,18 @@ opérateur, il vous donne ce message d'alerte. Habituellement, cela
 indique qu'un opérateur ou un séparateur a été omis, comme un point
 virgule. 
 
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item %s found where operator expected
+
+(I<%s> trouvé là où l'on attendait un opérateur) (S) L'analyseur
+lexical de Perl sait s'il attend un terme ou un opérateur.
+S'il voit ce qu'il sait être un terme alors qu'il s'attend à un
+opérateur, il vous donne ce message d'alerte. Habituellement, cela
+indique qu'un opérateur ou un séparateur a été omis, comme un point
+virgule. 
+
+#endif
 =item gdbm store returned %d, errno %d, key "%s"
 
 (Le stockage gdbm a renvoyé I<%d>, numéro d'erreur I<%d>, clef 
@@ -2216,7 +2414,7 @@ l'appel C<socket> ?
 C<sys$getuai>, sous-jacent de l'opérateur C<getpwnam>, a retourné une
 UIC invalide. 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item getsockopt() on closed socket %s
 
 (C< getsockopt()> sur une socket fermée I<%s>) (W closed) Vous avez
@@ -2272,7 +2470,7 @@ toute façon.
 C<last>, vous n'êtes pas autorisés à faire un C<goto> vers une
 destination non spécifiée. Cf. L<perlfunc/goto>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item %s-group starts with a count
 
 (Un groupe I<%s> commence par un compte) (F) Un groupe C<()> commence par un compte 
@@ -2330,7 +2528,7 @@ limitations arbitraires.
 0 ou 1 dans un nombre binaire. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Illegal binary digit %s
 
 (Chiffre binaire illégal) (F) Vous avez utilisé un chiffre autre que
@@ -2354,7 +2552,7 @@ en utilisant les options standards. Pour une raison ou pour une
 autre, votre version de Perl semble avoir été construite sans ce
 support. Parlez-en à votre administrateur Perl. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Illegal character in prototype for %s : %s
 
 (Caractère illégal dans le prototype pour I<%s> : I<%s>) (W syntax)
@@ -2396,7 +2594,7 @@ C<vec> (le troisième argument) doit être une puissance de deux de 1 à
 nombre octal. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Illegal octal digit %s
 
 (Chiffre octal illégal) (F) Vous avez utilisé un 8 ou un 9 dans un
@@ -2409,20 +2607,20 @@ nombre octal.
 essayé d'utiliser un 8 ou un 9 dans un nombre octal. L'interprétation
 du nombre octal s'est arrêtée avant le 8 ou le 9. 
 
-#if defined(perldiag573)
-=item Illegal switch in PERL5OPT: %s
-
-(Option illégale dans C<PERL5OPT> : I<%s>) (X) La variable
-d'environnement C<PERL5OPT> ne peut être utilisée que pour
-positionner les options suivantes : B<-[DIMUdmtw]>. 
-
-#endif
 #if defined(perldiag561) or defined(perldiag560)
 =item Illegal switch in PERL5OPT: %s
 
 (Option illégale dans C<PERL5OPT> : I<%s>) (X) La variable
 d'environnement C<PERL5OPT> ne peut être utilisée que pour
 positionner les options suivantes : B<-[DIMUdmw]>. 
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Illegal switch in PERL5OPT: %s
+
+(Option illégale dans C<PERL5OPT> : I<%s>) (X) La variable
+d'environnement C<PERL5OPT> ne peut être utilisée que pour
+positionner les options suivantes : B<-[DIMUdmtw]>. 
 
 #endif
 =item Ill-formed CRTL environ value "%s"
@@ -2441,21 +2639,6 @@ essayé de lire un nom logique ou une définition de symbole CLI en se
 préparant à parcourir C<%ENV> et il n'a pas vu le séparateur attendu
 entre les clefs et les valeurs, la ligne a donc été ignorée. 
 
-#if defined(perldiag573)
-=item (in cleanup) %s
-
-((au nettoyage) I<%s>) (W misc) Ce préfixe indique habituellement
-qu'une méthode C<DESTROY> a levé l'exception indiquée. Puisque les
-destructeurs sont appelés habituellement par le système à un moment
-arbitraire durant l'exécution, et bien souvent un grand nombre de
-fois, cet avertissement n'est affiché qu'une seule fois pour tous les
-échecs qui sinon auraient causé une répétition du même message.
-
-Les échecs des fonctions de rappel (I<callbacks>) définies par
-l'utilisateur et propagées par l'emploi du flag C<G_KEEPERR> peuvent
-également entraîner cet avertissement. Voir I<perlcall/G_KEEPERR>.
-
-#endif
 #if defined(perldiag560)
 =item (in cleanup) %s
 
@@ -2471,7 +2654,22 @@ l'utilisateur et propagées par l'emploi du flag C<G_KEEPERR> peuvent
 également entraîner cet avertissement. Voir I<perlcall>(1).
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
+=item (in cleanup) %s
+
+((au nettoyage) I<%s>) (W misc) Ce préfixe indique habituellement
+qu'une méthode C<DESTROY> a levé l'exception indiquée. Puisque les
+destructeurs sont appelés habituellement par le système à un moment
+arbitraire durant l'exécution, et bien souvent un grand nombre de
+fois, cet avertissement n'est affiché qu'une seule fois pour tous les
+échecs qui sinon auraient causé une répétition du même message.
+
+Les échecs des fonctions de rappel (I<callbacks>) définies par
+l'utilisateur et propagées par l'emploi du flag C<G_KEEPERR> peuvent
+également entraîner cet avertissement. Voir I<perlcall/G_KEEPERR>.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item In EBCDIC the v-string components cannot exceed 2147483647
 
 (En EBCDIC les composants de v-chaînes ne peuvent pas dépasser
@@ -2500,6 +2698,18 @@ C<system>, C<exec> ou un pipe ouvert vers un script setuid ou setgid
 si C<$ENV{PATH}> contient un répertoire qui a les droits en écriture
 pour tout le monde. Cf. L<perlsec>.
 
+#if defined(perldiag580) or defined(perldiag573)
+=item Insecure $ENV{%s} while running %s
+
+(C<$ENV{>I<%s>C<}> non sécurisé alors que I<%s> est en train de
+tourner) (F) Vous ne pouvez utilisez C<system>, C<exec> ou un pipe
+ouvert vers un script setuid ou setgid si C<$ENV{PATH}>, C<$ENV{IFS}>,
+C<$ENV{CDPATH}>, C<$ENV{ENV}> ou C<$ENV{BASH_ENV}> sont dérivés de
+données fournies (ou potentiellement fournies) par l'utilisateur. Le
+script doit positionner le chemin à une valeur connue, en utilisant
+une donnée digne de confiance. Cf. L<perlsec>.
+
+#endif
 #if defined(perldiag560)
 =item Insecure $ENV{%s} while running %s
 
@@ -2510,18 +2720,6 @@ C<$ENV{IFS}>, C<$ENV{CDPATH}>, C<$ENV{ENV}> ou C<$ENV{BASH_ENV}> sont
 dérivés de données fournies (ou potentiellement fournies) par
 l'utilisateur. Le script doit positionner le chemin à une valeur
 connue, en utilisant une donnée digne de confiance. 
-
-#endif
-#if defined(perldiag573)
-=item Insecure $ENV{%s} while running %s
-
-(C<$ENV{>I<%s>C<}> non sécurisé alors que I<%s> est en train de
-tourner) (F) Vous ne pouvez utilisez C<system>, C<exec> ou un pipe
-ouvert vers un script setuid ou setgid si C<$ENV{PATH}>, C<$ENV{IFS}>,
-C<$ENV{CDPATH}>, C<$ENV{ENV}> ou C<$ENV{BASH_ENV}> sont dérivés de
-données fournies (ou potentiellement fournies) par l'utilisateur. Le
-script doit positionner le chemin à une valeur connue, en utilisant
-une donnée digne de confiance. Cf. L<perlsec>.
 
 #endif
 #if defined(perldiag560)
@@ -2554,7 +2752,7 @@ sujette à des erreurs de perte de précision dans les opération
 ultérieures. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Integer overflow in %s number
 
 (Dépassement d'entier dans le nombre I<%s>) (W overflow) Le nombre
@@ -2577,7 +2775,7 @@ s'est très mal passé dans l'analyseur d'expressions régulières. La
 mention « << HERE » indique l'endroit où le problème a été constaté.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Internal disaster in regex; marked by <-- HERE in m/%s/
 
 (Désastre interne dans une expression régulière) (P) Quelque chose
@@ -2592,10 +2790,10 @@ mention « <-- HERE » indique l'endroit où le problème a été constaté.
 s'est très mal passé dans l'analyseur d'expressions régulières. 
 
 #endif
-#if defined(perldiag560)
+#if defined(perldiag580) or defined(perldiag573)
 =item Internal inconsistency in tracking vforks
 
-(Incohérence interne dans la recherche des C<vfork>s) (S) Il s'agit
+(Incohérence interne dans la recherche des C<vfork>) (S) Il s'agit
 d'un avertissement spécifique à VMS. Perl garde une trace du nombre
 de fois où vous avez appelé C<fork> et C<exec>, pour déterminer si
 l'appel courant à C<exec> devrait affecter le script en cours ou un
@@ -2605,10 +2803,10 @@ et traite ce C<exec> comme une requête pour terminer le script Perl
 et exécuter la commande spécifiée. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag560)
 =item Internal inconsistency in tracking vforks
 
-(Incohérence interne dans la recherche des C<vfork>) (S) Il s'agit
+(Incohérence interne dans la recherche des C<vfork>s) (S) Il s'agit
 d'un avertissement spécifique à VMS. Perl garde une trace du nombre
 de fois où vous avez appelé C<fork> et C<exec>, pour déterminer si
 l'appel courant à C<exec> devrait affecter le script en cours ou un
@@ -2626,7 +2824,7 @@ très mal tourné dans l'analyseur d'expressions régulières. La mention
 « << HERE » indique l'endroit où le problème a été constaté.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Internal urp in regex; marked by <-- HERE in m/%s/
 
 (Gloups interne dans une expression régulière) (P) Quelque chose a
@@ -2666,7 +2864,7 @@ un gestionnaire fourni par l'utilisateur. Cf. L<attributes>.
 (Conversion invalide dans I<%s> : « I<%s> ») (W printf) Perl ne
 comprend pas le format de conversion donné. Cf. L<perlfunc/sprintf>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Invalid [] range "%s" in regex; marked by <-- HERE in m/%s/
 
 (Intervalle C<[]> « I<%s> » invalide dans l'expression régulière) (F)
@@ -2685,7 +2883,7 @@ L'intervalle spécifié dans une classe de caractères a un caractère de
 début supérieur au caractère de fin. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Invalid [] range "%s" in transliteration operator
 
 (Intervalle C<[]> « I<%s> » invalide dans l'opérateur de translation)
@@ -2723,7 +2921,7 @@ mais l'habitude était de l'ignorer silencieusement.
 apparemment pas C<ioctl>, ce qui est quelque peu surprenant de la part
 d'une machine qui supporte le C.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item ioctl() on unopened %s
 
 (C<ioctl> sur %s non ouvert) (W unopened) Vous avez tenté un C<ioctl> sur
@@ -2731,7 +2929,7 @@ un handle de fichier qui n'a jamais été ouvert. Vérifiez la logique de votre
 programme et le nombre d'arguments.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item IO::Socket::atmark not implemented on this architecture
 
 (C<IO::Socket::atmark> n'est pas implementé sur cette architecture)
@@ -2739,7 +2937,7 @@ programme et le nombre d'arguments.
 soit par un appel système ou par un appel à C<ioctl> (C<SIOCATMARK>).
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item `%s' is not a code reference
 
 (« I<%s> » n'est pas une référence de code) (W overload) Le deuxième
@@ -2748,7 +2946,7 @@ soit par un appel système ou par un appel à C<ioctl> (C<SIOCATMARK>).
 la référence à un sous-programme.
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item `%s' is not an overloadable type
 
 (« I<%s> » n'est pas un type surchargeable) (W overload) Vous avez essayé
@@ -2787,7 +2985,7 @@ avez été appelé. Cf. L<perlfunc/redo>.
 filetest> était actif, l'échange entre les UID ou les GID réels et
 effectifs a échoué. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item listen() on closed socket %s
 
 (C<listen()> sur une socket fermée I<%s>) (W closed) Vous avez essayé
@@ -2813,7 +3011,7 @@ actuellement une limite à la longueur des chaînes que l'on peut
 traiter dans une assertion de « rétro-vision » (lookbehind).
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Lookbehind longer than %d not implemented in regex;
 
 marked by <-- HERE in m/%s/
@@ -2826,7 +3024,7 @@ restriction pourrait être levée dans une version ultérieure. La
 mention « <-- HERE » indique l'endroit où le problème a été constaté.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item lstat() on filehandle %s
 
 (C<lstat> sur un handle de fichier I<%s>) (W io) Vous avez essayé de
@@ -2860,7 +3058,7 @@ substitue I<prefixe2>. L'erreur peut survenir si les composants ne
 sont pas trouvés ou s'ils sont trop longs. Voir C<PERLLIB_PREFIX>
 dans le fichier I<README.os2> inclus dans la distribution de Perl.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Malformed prototype for %s: %s
 
 (Prototype pour I<%s> mal formé : I<%s>) (F) Vous avez essayé d'utiliser une
@@ -2870,14 +3068,24 @@ une brève vérification des prototypes de fonction pour détecter des erreurs
 lorsque la fonction est appelée.
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Malformed UTF-8 character (%s)
 
 (Caractère UTF-8 mal formé (I<%s>)) Perl a détecté quelque chose qui ne 
 respecte pas les règles d'encodage UTF-8.
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580)
+=item Malformed UTF-8 character (%s)
+
+Perl detected something that didn't comply with UTF-8 encoding rules.
+
+One possible cause is that you read in data that you thought to be in
+UTF-8 but it wasn't (it was for example legacy 8-bit data).  Another
+possibility is careless use of utf8::upgrade().
+
+#endif
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Malformed UTF-16 surrogate
 
 (Caractère de remplacement UTF-16 mal formé) Perl croyait être en train de lire
@@ -2905,7 +3113,7 @@ moteur d'expressions régulières ne contrôlait pas cela. La mention
 Cf L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item "%s" may clash with future reserved word
 
 (« I<%s> » risque d'entrer en conflit avec un futur mot réservé) (W)
@@ -2949,7 +3157,7 @@ sur la ligne courante.
 une constante décimale n'était pas sur une limite de 3 chiffres. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Misplaced _ in number
 
 (C<_> mal placé dans un nombre) (W syntax) Un caractère souligné dans
@@ -2994,7 +3202,7 @@ varier d'une ligne à l'autre.
 donnée en complément du message « I<%s> C<found where operator
 expected> ». Souvent l'opérateur manquant est une virgule. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Missing right brace on %s
 
 (Accolade fermante absente dans I<%s>) (F) L'accolade fermante est
@@ -3017,7 +3225,7 @@ where operator expected> ». Pour autant, n'ajoutez pas
 systématiquement un point-virgule simplement parce que vous avez lu
 ce message 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Modification of a read-only value attempted
 
 (Tentative de modification d'une valeur en lecture seule) (F) Vous
@@ -3057,7 +3265,7 @@ Un autre moyen serait d'affecter à C<substr> ce qui se trouve au-delà
 de la fin de la chaîne.
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Modification of non-creatable array value attempted, %s
 
 (Tentative de modification d'une valeur de impossible à créer, 
@@ -3075,7 +3283,7 @@ l'indice était probablement négatif, même en comptant à rebours
 depuis de la fin du tableau. 
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Modification of non-creatable hash value attempted, %s
 
 (Tentative de modification d'une valeur de hachage impossible à
@@ -3098,7 +3306,7 @@ particulière.
 (Le nom de module doit être constant) (F) Seul un nom de module brut
 est permis comme premier argument d'un C<use>. 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Module name required with -%c option
 
 (Nom de module obligatoire avec l'option C<->I<%c>) (F) Les options C<-M> et C<-m> 
@@ -3107,7 +3315,7 @@ dire quel module. Reportez-vous à L<perlrun> pour plus de détails à propos de
 C<-M> et de C<-m>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item More than one argument to open
 
 (C<open> avec plus d'un argument) (F) Vous avez demandé à la fonction C<open>
@@ -3176,7 +3384,7 @@ supprimer ce message. La déclaration C<our> est destinée à cela.
 C<read>/C<write>/C<send>/C<recv> avec un tampon de longueur plus
 petite que 0. C'est difficile à imaginer. 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Negative offset to vec in lvalue context
 
 (Décalage négatif pour C<vec> en contexte lvalue) (F) Lorsque c<vec> est
@@ -3209,7 +3417,7 @@ correspondance minimale, C<*?>, C<+?>, et C<??> ressemblent à des des
 quantifiants imbriqués mais ne le sont pas. Cf L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Nested quantifiers in regex; marked by <-- HERE in m/%s/
 
 (C<*?+> imbriqué dans l'expression régulière) (F) Vous ne pouvez
@@ -3228,6 +3436,7 @@ quantifiants imbriqués mais ne le sont pas. Cf L<perlre>.
 a été déclaré mais sa portée s'est terminée avant qu'il soit possible
 de s'en servir. 
 
+#if defined(perldiag561) or defined(perldiag560)
 =item No %s allowed while running setuid
 
 (Pas de I<%s> autorisé alors que l'on tourne avec setuid) (F) Pour des
@@ -3237,14 +3446,45 @@ Généralement, il y existera bien un autre moyen pour faire ce que vous
 voulez, c'est-à-dire que si ce moyen n'est pas sécurisé, il est au
 moins sécurisable. Cf. L<perlsec>.
 
-#if defined(perldiag573)
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item No %s allowed while running setuid
+
+(Pas de I<%s> autorisé alors que l'on tourne avec setuid) (F) Pour des
+questions de sécurité, certaines opérations sont trop dangereuses pour
+être exécutées, voire tentées, dans un script setuid ou setgid.
+Généralement, il y existe bien un autre moyen pour faire ce que vous
+voulez, c'est-à-dire que si ce moyen n'est pas sécurisé, il est au
+moins sécurisable. Cf. L<perlsec>.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item No B<-e> allowed in setuid scripts
 
 (Pas de B<-e> autorisé dans les scripts setuid) (F) Un script setuid
 ne peut être spécifié par l'utilisateur. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag560)
+=item No comma allowed after %s
+
+(Pas de virgule autorisée après I<%s>) (F) Lorsqu'un opérateur de
+liste a un handle de fichier ou un « object indirect », il ne doit
+pas y avoir une virgule ce premier argument et les arguments
+suivants. Sinon, il serait juste interprété comme tout autre un
+argument.
+
+Une situation ténébreuse dans laquelle ce message se produit est
+lorsque vous vous attendez à importer une constante dans votre espace
+de noms avec C<use> ou C<import> mais qu'une telle importation ne
+s'est pas produite. Vous auriez dû utiliser une liste d'importation
+explicite des constantes que vous vous attendiez à voir. Une liste
+d'importation explicite aurait probablement intercepté cette erreur
+plus tôt. Ou peut-être s'agit-il seulement d'une erreur de frappe
+dans le nom de la constante.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item No comma allowed after %s
 
 (Pas de virgule autorisée après I<%s>) (F) Lorsqu'un opérateur de
@@ -3265,25 +3505,6 @@ supporte pas cette constante. Ou peut-être s'agit-il seulement d'une
 erreur de frappe dans le nom de la constante, soit dans la liste
 fournie à C<use> ou C<import>, soit dans la ligne où la constante est
 utilisée ?
-
-#endif
-#if defined(perldiag560)
-=item No comma allowed after %s
-
-(Pas de virgule autorisée après I<%s>) (F) Lorsqu'un opérateur de
-liste a un handle de fichier ou un « object indirect », il ne doit
-pas y avoir une virgule ce premier argument et les arguments
-suivants. Sinon, il serait juste interprété comme tout autre un
-argument.
-
-Une situation ténébreuse dans laquelle ce message se produit est
-lorsque vous vous attendez à importer une constante dans votre espace
-de noms avec C<use> ou C<import> mais qu'une telle importation ne
-s'est pas produite. Vous auriez dû utiliser une liste d'importation
-explicite des constantes que vous vous attendiez à voir. Une liste
-d'importation explicite aurait probablement intercepté cette erreur
-plus tôt. Ou peut-être s'agit-il seulement d'une erreur de frappe
-dans le nom de la constante.
 
 #endif
 =item No command into which to pipe on command line
@@ -3352,7 +3573,7 @@ supportant pas la construction C<#!>.
 C<no> est reconnu et exécuté à la compilation et il ne renvoie aucune
 valeur utile. Cf. L<perlmod>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item No output file after > on command line
 
 (Pas de fichier de sortie après C<< > >> sur la ligne
@@ -3416,7 +3637,7 @@ l'option, sans qu'aucun espace n'intervienne.
 ligne de commande indiquée nécessite un argument obligatoire mais
 vous n'en avez pas spécifié. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item No such class %s
 
 (Aucune classe I<%s>) (F) Vous avez utilisé un qualifiant de classe dans
@@ -3431,7 +3652,7 @@ routine interne C<my_pclose> a essayé de fermer un pipe qui n'avait
 pas été ouvert. Ceci aurait dû être capturé plus tôt comme une
 tentative de fermeture d'un handle de fichier non ouvert. 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item No such pseudo-hash field "%s"
 
 (Aucun champ de pseudo-hachage « I<%s> ») (F) Vous avez essayé
@@ -3451,7 +3672,7 @@ correspondre tous les noms de champs valides aux indices du tableau
 pour que cela fonctionne. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item No such pseudo-hash field "%s" in variable %s of type %s
 
 (Aucun champ de pseudo-hachage « I<%s> » dans la variable I<%s> de
@@ -3512,7 +3733,7 @@ quelque chose d'autre à la place. Vous pouvez utiliser la fonction
 C<ref> pour trouver de quelle sorte de référence il s'agissait
 exactement. Cf. L<perlref>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item %s not allowed in length fields
 
 (I<%s> interdit dans un champ de longueur) (F) Le nombre dans un canevas de
@@ -3589,7 +3810,7 @@ C<SYS$TIMEZONE_DIFFERENTIAL> pour qu'il traduise le nombre de
 secondes à ajouter à UTC afin d'obtenir l'heure locale. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item no UTC offset information; assuming local time is UTC
 
 (Pas d'information sur le décalage UTC ; adopte UTC comme heure
@@ -3601,12 +3822,22 @@ C<SYS$TIMEZONE_DIFFERENTIAL> pour qu'il traduise le nombre de
 secondes à ajouter à UTC afin d'obtenir l'heure locale. 
 
 #endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Null filename used
+
+(Nom de fichier vide utilisé) (F) Vous ne pouvez utiliser un nom de
+fichier vide avec C<require>, notamment car sur beaucoup de machines
+ceci signifie le répertoire courant ! Cf. L<perlfunc/require>.
+
+#endif
+#if defined(perldiag561) or defined(perldiag560)
 =item Null filename used
 
 (Nom de fichier vide utilisé) (F) Vous ne pouvez exiger un nom de
 fichier vide, notamment car sur beaucoup de machines ceci signifie le
 répertoire courant !  Cf. L<perlfunc/require>.
 
+#endif
 =item NULL OP IN RUN
 
 (OP NUL DANS RUN) (P debugging) Une routine interne a appelé C<run>
@@ -3619,7 +3850,7 @@ doit être une spécification de format d'image valide. On a trouvé que
 cet argument était vide, ce qui signifie probablement que vous lui
 avez fourni une valeur non initialisée. Cf. L<perlform>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Null realloc
 
 (Réallocation nulle) (P) Une tentative a eu lieu pour réallouer le
@@ -3633,18 +3864,25 @@ pointeur C<NULL>.
 pointeur C<NULL>. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag560)
+=item NULL regexp argument
+
+(argument NUL dans l'expression régulière) (P) Les routines internes
+de recherche de motifs ont tout explosé. 
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item NULL regexp argument
 
 (Argument NUL dans l'expression régulière) (P) Les routines internes
 de recherche de motifs ont tout explosé. 
 
 #endif
-#if defined(perldiag560)
-=item NULL regexp argument
+#if defined(perldiag580) or defined(perldiag573)
+=item NULL regexp parameter
 
-(argument NUL dans l'expression régulière) (P) Les routines internes
-de recherche de motifs ont tout explosé. 
+(Paramètre NUL dans l'expression régulière) (P) Les routines internes
+de recherche de motifs ont perdu la tête. 
 
 #endif
 #if defined(perldiag560)
@@ -3654,13 +3892,7 @@ de recherche de motifs ont tout explosé.
 de recherche de motifs ont perdu la tête. 
 
 #endif
-#if defined(perldiag573)
-=item NULL regexp parameter
-
-(Paramètre NUL dans l'expression régulière) (P) Les routines internes
-de recherche de motifs ont perdu la tête. 
-
-#endif
+#if defined(perldiag561) or defined(perldiag560)
 =item Number too long
 
 (Nombre trop long) (F) Perl limite la représentation des nombres
@@ -3670,6 +3902,18 @@ susceptibles d'éliminer cette limitation arbitraire. En attendant,
 essayez d'utiliser la notation scientifique (ex. C<1e6> au lieu de
 C<1_000_000>). 
 
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Number too long
+
+(Nombre trop long) (F) Perl limite la représentation des nombres
+décimaux dans les programmes à environ 250 caractères. Vous avez
+dépassé cette longueur. Les versions futures de Perl sont
+susceptibles d'éliminer cette limitation arbitraire. En attendant,
+essayez d'utiliser la notation scientifique (ex. C<1e6> au lieu de
+C<1_000_000>). 
+
+#endif
 =item Octal number in vector unsupported
 
 (Nombre octal dans un vecteur non supporté) (F) Les nombres
@@ -3677,7 +3921,7 @@ commençant par un C<0> ne sont actuellement pas autorisés dans les
 vecteurs. L'interprétation en octal de tels nombres sera peut-être
 supportée dans une future version. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Octal number > 037777777777 non-portable
 
 (Nombre octal > C<0>37777777777, non portable) (W portable) Le nombre
@@ -3696,7 +3940,7 @@ octal que vous avez spécifié est plus grand que C<2**32-1>
 (4 294 967 295) et n'est donc pas portable d'un système à l'autre. 
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Odd number of arguments for overload::constant
 
 (Nombre impair d'arguments pour C<overload::constant>) (W overload)
@@ -3704,7 +3948,7 @@ L'appel de  C<overload::constant> comporte un nombre impair d'arguments.
 Ils devraient aller par paires.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Odd number of elements in anonymous hash
 
 (Nombre impair d'éléments dans un hachage anonyme) (W misc) Vous avez
@@ -3727,6 +3971,15 @@ en dehors du tampon. Ceci est difficile à imaginer. La seule
 exception à cette règle est que faire un C<sysread> après un tampon
 étendra ce tampon et remplira de zéros la nouvelle zone. 
 
+#if defined(perldiag580) or defined(perldiag573)
+=item %s() on unopened %s
+
+(I<%s>C<()> sur I<%s> fermé) (W unopened) Une opération
+d'entrée-sortie a été tentée sur un handle de fichier qui n'a jamais
+été initialisé. Vous devez commencer pas appeler C<open>, C<sysopen>,
+C<socket> ou un constructeur du paquetage C<FileHandle>.
+
+#endif
 #if defined(perldiag561)
 =item %s() on unopened %s %s
 
@@ -3736,16 +3989,7 @@ d'entrée-sortie a été tentée sur un handle de fichier qui n'a jamais
 C<socket> ou un constructeur du paquetage C<FileHandle>.
 
 #endif
-#if defined(perldiag573)
-=item %s() on unopened %s
-
-(I<%s>C<()> sur I<%s> fermé) (W unopened) Une opération
-d'entrée-sortie a été tentée sur un handle de fichier qui n'a jamais
-été initialisé. Vous devez commencer pas appeler C<open>, C<sysopen>,
-C<socket> ou un constructeur du paquetage C<FileHandle>.
-
-#endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item -%s on unopened filehandle %s
 
 (C<->I<%s> sur un handle de fichier fermé I<%s>) (W unopened) Vous avez essayé
@@ -3775,7 +4019,7 @@ quelque opération que ce soit, à moins que la clé de surcharge
 C<fallback> soit spécifiée comme étant vraie. Cf L<overload>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Operation `%s': no method found, %s
 
 (Opération « I<%s> » : aucune méthode trouvée, I<%s>) (F) Une
@@ -3819,23 +4063,7 @@ requête. Cependant, la requête a été jugée assez large (par défaut
 64K à la compilation), la possibilité de sortir en capturant cette
 erreur est donc permise. 
 
-#if defined(perldiag560)
-=item Out of memory during request for %s
-
-(Dépassement de mémoire pendant une requête pour I<%s>) (X|F) La
-fonction C<malloc> a renvoyé 0, ce qui indique que la mémoire
-restante (ou la mémoire virtuelle) n'a pas suffit à satisfaire la
-requête.
-
-La requête a été jugée faible, la possibilité de la capturer est donc
-dépendante de la façon dont Perl a été compilé. Par défaut, elle ne
-peut être capturée. Cependant, s'il a été compilé à cet effet, Perl
-peut utiliser le contenu de C<$^M> comme une zone d'urgence après
-être sorti par C<die> avec ce message. Dans ce cas l'erreur peut-être
-capturée I<une seule fois>.
-
-#endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Out of memory during request for %s
 
 (Dépassement de mémoire pendant une requête pour I<%s>) (X|F) La
@@ -3850,6 +4078,22 @@ peut utiliser le contenu de C<$^M> comme une zone d'urgence après
 être sorti par C<die> avec ce message. Dans ce cas l'erreur peut-être
 capturée I<une seule fois>, et le message d'erreur indiquera le fichier
 et la ligne où s'est produite la requête qui a échoué.
+
+#endif
+#if defined(perldiag560)
+=item Out of memory during request for %s
+
+(Dépassement de mémoire pendant une requête pour I<%s>) (X|F) La
+fonction C<malloc> a renvoyé 0, ce qui indique que la mémoire
+restante (ou la mémoire virtuelle) n'a pas suffit à satisfaire la
+requête.
+
+La requête a été jugée faible, la possibilité de la capturer est donc
+dépendante de la façon dont Perl a été compilé. Par défaut, elle ne
+peut être capturée. Cependant, s'il a été compilé à cet effet, Perl
+peut utiliser le contenu de C<$^M> comme une zone d'urgence après
+être sorti par C<die> avec ce message. Dans ce cas l'erreur peut-être
+capturée I<une seule fois>.
 
 #endif
 =item Out of memory during ridiculously large request
@@ -3945,7 +4189,7 @@ appelée avec des données opérationnelles invalides.
 appelée avec des données opérationnelles invalides. 
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item panic: do_trans_%s
 
 (panique : C<do_trans_>I<%s>) (P) Les routines internes C<do_trans> ont été
@@ -4073,14 +4317,14 @@ dans un contexte qui n'était pas un contexte de boucle.
 des données opératoires invalides.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item panic: pp_match%s
 
 (panique : C<pp_match>I<%s>) (P) La routine interne C<pp_match> a été appelée avec
 des données opératoires invalides.
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item panic: pp_split
 
 (panique : C<pp_split>) (P) Quelque-chose de terrible a mal tourné en préparant
@@ -4119,7 +4363,7 @@ d'enlever plus de chaînes qu'il en existe.
 (panique : C<top_env>) (P) Le compilateur a tenté de faire un C<goto>
 ou quelque chose d'aussi bizarre. 
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item panic: utf16_to_utf8: odd bytelen
 
 (panique : C<utf16_to_utf8>, C<bytlen> impair) (P) Quelque-chose a essayé
@@ -4148,7 +4392,7 @@ alors que vous vouliez dire :
 Souvenez-vous que C<my>, C<our> et C<local> regroupent plus fortement
 que la virgule.
 
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item (perhaps you forgot to load "%s"?)
 
 (peut-être avez-vous oublié de charger « I<%s> » ?) (F) C'est une supposition
@@ -4167,7 +4411,7 @@ par une version plus récente que celle exécutée actuellement. Depuis
 combien de temps n'avez-vous pas fait de remise à niveau ? 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item perlio: argument list not closed for layer "%s"
 
 (perlio : la liste d'arguments de la couche « I<%s> » n'est pas fermée) (S)
@@ -4181,7 +4425,18 @@ a échoué, le message peut être provoqué par la valeur de la
 variable d'environnement C<PERLIO>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580)
+=item perlio: argument list not closed for layer "%s"
+
+(W layer) When pushing a layer with arguments onto the Perl I/O system you
+forgot the ) that closes the argument list.  (Layers take care of transforming
+data between external and internal representations.)  Perl stopped parsing
+the layer list at this point and did not attempt to push this layer.
+If your program didn't explicitly request the failing operation, it may be
+the result of the value of the environment variable PERLIO.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item perlio: invalid separator character %s in attribute list
 
 (perlio : caractère séparateur I<%s> invalide dans la liste d'attributs)
@@ -4191,7 +4446,16 @@ vous avez utilisé autre chose qu'un espace ou un deux-points entre les
 entre parenthèses, peut-être cette liste a-t-elle été terminée trop tôt.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580)
+=item perlio: invalid separator character %s in layer specification list %s
+
+(W layer) When pushing layers onto the Perl I/O system, something other than a
+colon or whitespace was seen between the elements of a layer list.
+If the previous attribute had a parenthesised parameter list, perhaps that
+list was terminated too soon.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item perlio: unknown layer "%s"
 
 (perlio : couche « I<%s> » inconnue) (S) Le programme a essayé
@@ -4204,7 +4468,18 @@ explicitement l'opération qui a échoué, le message peut être provoqué
 par la valeur de la variable d'environnement C<PERLIO>.
 
 #endif
-#if defined(perldiag573) or defined(perldiag561)
+#if defined(perldiag580)
+=item perlio: unknown layer "%s"
+
+(W layer) An attempt was made to push an unknown layer onto the Perl I/O
+system.  (Layers take care of transforming data between external and
+internal representations.)  Note that some layers, such as C<mmap>,
+are not supported in all environments.  If your program didn't
+explicitly request the failing operation, it may be the result of the
+value of the environment variable PERLIO.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573) or defined(perldiag561)
 =item Perl %s required--this is only version %s, stopped
 
 (Perl I<%s> requis --- il ne s'agit que de la version I<%s>,
@@ -4214,6 +4489,7 @@ combien de temps n'avez-vous pas fait de remise à niveau ?
 Cf. L<perlfunc/require>.
 
 #endif
+#if defined(perldiag573) or defined(perldiag561) or defined(perldiag560)
 =item PERL_SH_DIR too long
 
 (C<PERL_SH_DIR> trop long) (F) Il s'agit d'une erreur spécifique à
@@ -4221,6 +4497,7 @@ OS/2. C<PERL_SH_DIR> est le répertoire où se trouve le shell I<sh>.
 Voir C<PERL_SH_DIR> dans le fichier I<README.os2> compris dans la
 distribution de Perl. 
 
+#endif
 #if defined(perldiag560)
 =item perl: warning: Setting locale failed.
 
@@ -4288,11 +4565,20 @@ La manière de vraiment résoudre le problème peut être trouvée dans
 I<perllocale>(1), à la section « Locale Problems ».
 
 #endif
+#if defined(perldiag573)
+=item Permission denied
+
+(Permission refusée) (F) L'émulateur setuid de I<suidperl> a décidé
+que vous n'étiez pas quelqu'un de gentil.
+
+#endif
+#if defined(perldiag561) or defined(perldiag560)
 =item Permission denied
 
 (Permission refusée) (F) L'émulateur setuid de I<suidperl> a décidé
 que vous n'étiez pas quelqu'un de bon. 
 
+#endif
 =item pid %x not a child
 
 (le pid I<%x> n'est pas un fils) (W exec) Il s'agit d'une alerte
@@ -4301,7 +4587,7 @@ qui n'est pas un sous-processus du processus courant. Même si cela
 est correct dans la perspective de VMS, cela n'est probablement pas
 ce que vous vouliez. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item P must have an explicit size
 
 (« P » doit avoir une taille explicite) (F) Le format P pour
@@ -4316,7 +4602,7 @@ dans la syntaxe pour une classe de caractères C<[: :]> est inconnue.
 Cf. L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item POSIX class [:%s:] unknown in regex;
 
 marked by <-- HERE in m/%s/
@@ -4335,7 +4621,20 @@ C<[[:print:]]> au lieu de C<isprint>. Cf. L<perlre>.
 de la fonction POSIX C<getpgrp>, qui ne prend pas d'argument, au
 contraire de la version BSD, qui prend un PID. 
 
-#if defined(perldiag573)
+#if defined(perldiag561)
+=item POSIX syntax [%s] belongs inside character classes
+
+(La syntaxe POSIX C<[>I<%s>]> doit se trouver à l'intérieur d'une
+classe dans une expression régulière) (W unsafe) Les constructions de
+classe C<[: :]>, C<[= =]> et C<[. .]> doivent obligatoirement se
+trouver I<à l'intérieur> d'une classe de caractères, et les C<[]> font
+partie de la construction. Exemple C</[012[:alpha:]345]/>. Notez que
+C<[= =]> et C<[. .]> ne sont pas encore implémentés ; ce sont
+simplement des syntaxes réservées pour les extensions à venir et
+causent des erreurs fatales. Cf L<perlre>.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item POSIX syntax [%s] belongs inside character classes in regex;
 
 marked by <-- HERE in m/%s/
@@ -4352,19 +4651,6 @@ l'endroit où le problème a été constaté. Cf L<perlre>.
 
 #endif
 #if defined(perldiag561)
-=item POSIX syntax [%s] belongs inside character classes
-
-(La syntaxe POSIX C<[>I<%s>]> doit se trouver à l'intérieur d'une
-classe dans une expression régulière) (W unsafe) Les constructions de
-classe C<[: :]>, C<[= =]> et C<[. .]> doivent obligatoirement se
-trouver I<à l'intérieur> d'une classe de caractères, et les C<[]> font
-partie de la construction. Exemple C</[012[:alpha:]345]/>. Notez que
-C<[= =]> et C<[. .]> ne sont pas encore implémentés ; ce sont
-simplement des syntaxes réservées pour les extensions à venir et
-causent des erreurs fatales. Cf L<perlre>.
-
-#endif
-#if defined(perldiag561)
 =item POSIX  syntax [. .] is reserved for future extensions
 
 (Syntaxe C<[. .]> pour une classe de caractères réservée pour de
@@ -4375,22 +4661,6 @@ extensions. Si vous avez besoin de représenter de telles séquences de
 caractères à l'intérieur d'une classe de caractères dans une
 expression régulière, protégez simplement les crochets avec un
 anti-slash : C<\[.> et C<.\]>.
-
-#endif
-#if defined(perldiag573)
-=item POSIX syntax [. .] is reserved for future extensions in regex;
-
-marked by <-- HERE in m/%s/
-
-(Syntaxe C<[. .]> pour une classe de caractères réservée pour de
-futures extensions) (W regexp) À l'intérieur des classes de caractères
-dans les expressions régulières (C<[]>), la syntaxe commençant par
-C<[.> et se terminant par C<.]> est réservée pour de futures
-extensions. Si vous avez besoin de représenter de telles séquences de
-caractères à l'intérieur d'une classe de caractères dans une
-expression régulière, protégez simplement les crochets avec un
-anti-slash : C<\[.> et C<.\]>. La mention « <-- HERE » indique
-l'endroit où le problème a été constaté. Cf L<perlre>.
 
 #endif
 #if defined(perldiag561)
@@ -4406,7 +4676,23 @@ expression régulière, protégez simplement les crochets avec un
 anti-slash : C<\[=> et C<=\]>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
+=item POSIX syntax [. .] is reserved for future extensions in regex;
+
+marked by <-- HERE in m/%s/
+
+(Syntaxe C<[. .]> pour une classe de caractères réservée pour de
+futures extensions) (W regexp) À l'intérieur des classes de caractères
+dans les expressions régulières (C<[]>), la syntaxe commençant par
+C<[.> et se terminant par C<.]> est réservée pour de futures
+extensions. Si vous avez besoin de représenter de telles séquences de
+caractères à l'intérieur d'une classe de caractères dans une
+expression régulière, protégez simplement les crochets avec un
+anti-slash : C<\[.> et C<.\]>. La mention « <-- HERE » indique
+l'endroit où le problème a été constaté. Cf L<perlre>.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item POSIX syntax [= =] is reserved for future extensions in regex;
 
 marked by <-- HERE in m/%s/
@@ -4483,7 +4769,7 @@ un octet de sentinelle à la fin du tampon au cas où. On a écrasé cet
 octet de sentinelle et Perl suppose que la mémoire est maintenant
 corrompue. Cf. L<perlfunc/ioctl>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Possible unintended interpolation of %s in string
 
 (Interpolation de I<%s> dans une chaîne peut-être non désirée) (W ambiguous)
@@ -4553,20 +4839,6 @@ moment auparavant. Vérifier le flux logique de votre programme.
 handle de fichier dans lequel vous imprimez s'est retrouvé fermé à un
 moment auparavant. Vérifier le flux logique de votre programme. 
 
-#if defined(perldiag573)
-=item Process terminated by SIG%s
-
-(Processus terminé par C<SIG>I<%s>) (W) Il s'agit d'un message
-standard formulé par les applications OS/2, alors que les
-applications Unix meurent en silence. C'est considéré comme une
-caractéristique du portage sous OS/2. Cet avertissement peut
-facilement être désactivé en positionnant les gestionnaires de
-signaux appropriés, voir L<perlipc/"Signals">. Voir également « Process terminated by
-C<SIGTERM>/C<SIGINT> » (I<N.d.T.> : Processus terminé par
-C<SIGTERM>/C<SIGINT>) dans le fichier I<README.os2> livré avec la
-distribution de Perl. 
-
-#endif
 #if defined(perldiag560)
 =item Process terminated by SIG%s
 
@@ -4581,13 +4853,34 @@ C<SIGTERM>/C<SIGINT>) dans le fichier I<README.os2> livré avec la
 distribution de Perl. 
 
 #endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Process terminated by SIG%s
+
+(Processus terminé par C<SIG>I<%s>) (W) Il s'agit d'un message
+standard formulé par les applications OS/2, alors que les
+applications Unix meurent en silence. C'est considéré comme une
+caractéristique du portage sous OS/2. Cet avertissement peut
+facilement être désactivé en positionnant les gestionnaires de
+signaux appropriés, voir L<perlipc/"Signals">. Voir également « Process terminated by
+C<SIGTERM>/C<SIGINT> » (I<N.d.T.> : Processus terminé par
+C<SIGTERM>/C<SIGINT>) dans le fichier I<README.os2> livré avec la
+distribution de Perl. 
+
+#endif
 =item Prototype mismatch: %s vs %s
 
 (Non correspondance de prototypes : I<%s> contre I<%s>) (S) La
 sous-fonction qui est en train d'être déclarée ou définie a été
 précédemment déclarée ou définie avec un prototype différent. 
 
-#if defined(perldiag573)
+#if defined(perldiag580)
+=item Prototype not terminated
+
+(F) You've omitted the closing parenthesis in a function prototype
+definition.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item Prototype not terminated
 
 (Prototype non terminé) (F) Vous avez oublié la parenthèse fermante
@@ -4606,7 +4899,7 @@ La mention « <-- HERE » indique l'endroit où le problème a été constaté.
 Cf. L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Quantifier in {,} bigger than %d in regex;
 
 marked by <-- HERE in m/%s/
@@ -4617,7 +4910,7 @@ construction C<{min,max}>. La mention « <-- HERE » indique l'endroit
 où le problème a été constaté. Cf L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Quantifier unexpected on zero-length expression;
 
 marked by <-- HERE in m/%s/
@@ -4633,6 +4926,18 @@ La mention « <-- HERE » indique l'endroit
 où le problème a été constaté.
 
 #endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Range iterator outside integer range
+
+(Itérateur d'intervalle en dehors d'un intervalle) (F) L'un des
+arguments numériques (ou les deux) de l'opérateur d'intervalle C<..>
+est en dehors de l'intervalle qui peut être représenté en interne par
+des entiers. Une façon de contourner cela consiste à forcer Perl à
+utiliser des incréments de chaînes magiques en ajoutant C<0> au début
+de vos nombres.
+
+#endif
+#if defined(perldiag561) or defined(perldiag560)
 =item Range iterator outside integer range
 
 (Itérateur d'intervalle en dehors d'un intervalle) (F) L'un (ou les
@@ -4642,6 +4947,7 @@ entiers. Une façon de contourner cela consiste à forcer Perl à utiliser des
 incréments de chaînes magiques en ajoutant C<0> au début de vos
 nombres. 
 
+#endif
 =item readline() on closed filehandle %s
 
 (C<readline()> sur un handle de fichier fermé I<%s>) (W closed) Le
@@ -4660,7 +4966,7 @@ de 64K sur une machine MS-DOS.
 routine interne a appelé C<realloc> sur quelque chose qui avait déjà
 été libéré. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Recompile perl with B<-D>DEBUGGING to use B<-D> switch
 
 (Recompilez perl avec C<-DDEBUGGING> pour utiliser l'option B<-D>) (F
@@ -4686,7 +4992,7 @@ installation de Perl.
 niveaux d'héritage ont été utilisés. Ceci indique probablement une
 boucle accidentelle dans votre hiérarchie de classes. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Recursive inheritance detected while looking for method %s
 
 (Héritage récursif détecté en recherchant la méthode 'I<%s>') (F) Plus
@@ -4729,7 +5035,7 @@ une référence qui était déjà lâche. Ceci n'a aucun effet.
 passé à la fonction interne C<sv_replace> un nouvel SV avec un nombre
 de références différent de 1. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Reference to nonexistent group in regex;
 
 marked by <-- HERE in m/%s/
@@ -4758,7 +5064,7 @@ La partie d'une expression régulière sujette au quantifiant C<*> ou
 C<+> pourrait correspondre à une chaîne vide. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Regexp out of space
 
 (Plus d'espace pour l'expression régulière) (P) Il s'agit d'une
@@ -4803,7 +5109,7 @@ arguments soit consommés, soit en utilisant C<^> au lieu de C<@> (pour
 les variables scalaires), soit en faisant un C<shift> ou un C<pop>
 (pour les variables de tableaux). Cf. L<perlform>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Scalars leaked: %d
 
 (Fuite de scalaires : I<%d>) (P) Quelque chose s'est mal passé dans
@@ -4877,7 +5183,7 @@ essayé d'utiliser la fonction C<seek> ou C<sysseek> sur un handle de
 fichier qui soit n'a jamais été ouvert, soit a été fermé depuis. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item %sseek() on unopened filehandle
 
 (I<%s>C<seek()> sur un handle de fichier non ouvert) (W unopened) Vous avez
@@ -4890,7 +5196,7 @@ fichier qui soit n'a jamais été ouvert, soit a été fermé depuis.
 (C<select> non implémenté) (F) Cette machine n'implémente pas l'appel
 système C<select>. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Self-ties of arrays and hashes are not supported
 
 (Les auto-liens de tableaux et de hachages ne sont pas supportés) (F)
@@ -4928,7 +5234,7 @@ auparavant. Vérifiez le flux logique de votre programme.
 par une extension incomplète C<(?>. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Sequence (? incomplete in regex; marked by <-- HERE in m/%s/
 
 (Séquence C<(?> incomplète) (F) Une expression régulière finissait par
@@ -4945,7 +5251,7 @@ d'extension des expressions régulières a réservé le caractère mais
 n'a pas encore été écrite. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Sequence (?%s...) not implemented in regex;
 
 marked by <-- HERE in m/%s/
@@ -4964,7 +5270,7 @@ L<perlre>.
 expression régulière qui n'a aucun sens. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Sequence (?%s...) not recognized in regex;
 
 marked by <-- HERE in m/%s/
@@ -4982,7 +5288,7 @@ régulière doit se terminer par une parenthèse fermée. Les parenthèses
 imbriquées ne sont pas autorisées. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Sequence (?#... not terminated in regex;
 
 marked by <-- HERE in m/%s/
@@ -4994,7 +5300,7 @@ interdite. La mention « <-- HERE » indique l'endroit dans
 l'expression régulière où le problème a été constaté. Cf L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Sequence (?{...}) not terminated or not {}-balanced in regex;
 
 marked by <-- HERE in m/%s/
@@ -5011,7 +5317,7 @@ régulière où le problème a été constaté. Cf L<perlre>.
 
 (Erreur de serveur 500) Voir Server error (Erreur de serveur). 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Server error
 
 (Erreur du serveur) Il s'agit du message d'erreur généralement vu
@@ -5088,8 +5394,8 @@ I<Configure>.
 
 =item seteuid() not implemented
 
-(C<seteuid()> non implémenté) (F) Vous avez essayé d'affecter C<< $>
->> mais votre système d'exploitation ne supporte pas l'appel système
+(C<seteuid()> non implémenté) (F) Vous avez essayé d'affecter C<< $> >> 
+mais votre système d'exploitation ne supporte pas l'appel système
 C<seteuid> (ou un équivalent) ou du moins c'est ce que pense
 I<Configure>. 
 
@@ -5134,9 +5440,9 @@ la mémoire partagée des IPC System V sur votre système.
 
 =item <> should be quotes
 
-(C<< <> >> devraient être des apostrophes) (F) Vous avez écrit C<<
-require <fichier> >> alors que vous auriez dû écrire C<require
-'fichier'>.
+(C<< <> >> devraient être des apostrophes) (F) Vous avez écrit 
+C<< require <fichier> >> alors que vous auriez dû écrire 
+C<require 'fichier'>.
 
 =item /%s/ should probably be written as "%s"
 
@@ -5180,7 +5486,7 @@ Cf. L<perlfunc/sort>.
 Une routine de comparaison pour C<sort> ne peut pas renvoyer une
 valeur de liste avec plus ou moins d'un élément. Cf. L<perlfunc/sort>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item splice() offset past end of array
 
 (Le décalage pour C<splice> est en dehors du tableau) (W misc) Vous
@@ -5191,21 +5497,21 @@ d'agrandir explicitement votre tableau en alimentant C<$#tableau> avec
 C<$decalage>. Cf. L<perlfunc/splice>.
 
 #endif
-#if defined(perldiag560)
-=item Split loop
-
-(Boucle dans un C<split>) (P) Le C<split> bouclait sans fin.
-('Evidemment, un C<split> ne devrait boucler plus de fois qu'il n'y a
-de caractères en entrée, ce qui s'est passé.) 
-
-#endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Split loop
 
 (Boucle dans un C<split>) (P) Le C<split> bouclait sans fin. (De
 toute évidence, un C<split> ne devrait boucler plus de fois qu'il n'y
 a de caractères en entrée, c'est pourtant qui s'est passé.)
 Cf. L<perlfunc/split>.
+
+#endif
+#if defined(perldiag560)
+=item Split loop
+
+(Boucle dans un C<split>) (P) Le C<split> bouclait sans fin.
+('Evidemment, un C<split> ne devrait boucler plus de fois qu'il n'y a
+de caractères en entrée, ce qui s'est passé.) 
 
 #endif
 =item Statement unlikely to be reached
@@ -5226,7 +5532,7 @@ essayé d'utiliser la fonction C<stat> (ou un test de fichier
 a été fermé depuis. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item stat() on unopened filehandle %s
 
 (C<stat()> sur un handle de fichier non ouvert) (W unopened) Vous avez
@@ -5246,7 +5552,7 @@ c'est suivi par trois répétitions de C<xyz> est
 C</abc(?=(?:xyz){3})/>, et non C</abc(?=xyz){3}/>. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Stub found while resolving method `%s' overloading %s
 
 (Une souche a été trouvée lors de la résolution de la méthode 'I<%s>'
@@ -5268,6 +5574,18 @@ souches (I<stubs>) d'importation. Les souches ne devraient jamais
 rompre cela. 
 
 #endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Subroutine %s redefined
+
+(Sous-programme I<%s> redéfini) (W redefine) Vous avez redéfini un
+sous-programme. Pour supprimer cet avertissement, écrivez :
+
+  {
+      no warnings 'redefine';
+      eval "sub name { ... }";
+  }
+
+#endif
 #if defined(perldiag560)
 =item Subroutine %s redefined
 
@@ -5280,19 +5598,15 @@ sous-programme. Pour supprimer cet avertissement, écrivez :
   }
 
 #endif
-#if defined(perldiag573)
-=item Subroutine %s redefined
+#if defined(perldiag560)
+=item Substitution loop
 
-(Sous-programme I<%s> redéfini) (W redefine) Vous avez redéfini un
-sous-programme. Pour supprimer cet avertissement, écrivez :
-
-  {
-	no warnings 'redefine';
-      eval "sub name { ... }";
-  }
+(Boucle dans une substitution) (P) La substitution boucle sans fin.
+('Evidemment, une substitution ne devrait boucler plus de fois qu'il
+n'y a de caractères en entrée, ce qui s'est passé.) 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Substitution loop
 
 (Boucle dans une substitution) (P) La substitution boucle sans fin. Il
@@ -5302,15 +5616,7 @@ Pourtant, c'est ce qui s'est produit. Cf. la discussion sur la
 substitution dans L<perlop/"Quote and Quote-like Operators">.
 
 #endif
-#if defined(perldiag560)
-=item Substitution loop
-
-(Boucle dans une substitution) (P) La substitution boucle sans fin.
-('Evidemment, une substitution ne devrait boucler plus de fois qu'il
-n'y a de caractères en entrée, ce qui s'est passé.) 
-
-#endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Substitution pattern not terminated
 
 (Motif pour la substitution non terminé) (F) L'analyseur lexical ne
@@ -5321,6 +5627,8 @@ accolades ou les signes inférieur/supérieur) comptent les niveaux
 d'imbrication. Omettre le C<$> au début d'une variable C<$s> peut
 causer cette erreur.
 
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item Substitution replacement not terminated
 
 (Remplacement pour la substitution non terminé) (F) L'analyseur
@@ -5331,6 +5639,8 @@ crochets, les accolades ou les signes inférieur/supérieur) comptent
 les niveaux d'imbrication. Omettre le C<$> au début d'une variable C<$s>
 peut causer cette erreur. 
 
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item substr outside of string
 
 (C<substr> à l'extérieur d'une chaîne) (W substr|F) Vous avez essayé
@@ -5340,6 +5650,8 @@ longueur de la chaîne. Cet avertissement est fatal si C<substr> est
 utilisé dans un contexte de lvalue (par exemple comme opérateur du
 côté gauche d'une affectation ou comme argument d'un sous-programme). 
 
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item suidperl is no longer needed since %s
 
 (suidperl n'est plus nécessaire depuis I<%s>) (F) Votre Perl a été
@@ -5347,7 +5659,8 @@ compilé avec B<-DSETUID_SCRIPTS_ARE_SECURE_NOW> mais une version de
 l'émulateur setuid est tout de même arrivé à se lancer d'une manière
 ou d'une autre. 
 
-#if defined(perldiag573)
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item Switch (?(condition)... contains too many branches in regex;
 
 marked by <-- HERE in m/%s/
@@ -5364,7 +5677,7 @@ La mention « <-- HERE » indique l'endroit où le problème a été constaté.
 Cf L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Switch condition not recognized in regex;
 
 marked by <-- HERE in m/%s/
@@ -5412,31 +5725,20 @@ avez accidentellement lancé votre script via le Bourne shell au lieu
 de Perl. Vérifiez la ligne C<#!> ou lancez vous-même votre script
 manuellement dans Perl avec I<perl nom_script>. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item syntax error in file %s at line %d, next 2 tokens "%s"
 
 (Erreur de syntaxe dans le fichier I<%s> à la ligne I<%d>, près des
 deux tokens "I<%s>") (F) Cette erreur est susceptible d'apparaître si vous
 soumettez un script Perl-5 à un interprêteur Perl-4, surtout si les deux
-tokens signalés sont "use strict"
-ou "my $var" ou "our $var".
+tokens signalés sont "use strict", "my $var" ou "our $var".
 
 #endif
 =item %s syntax OK
 
 (I<%s> syntaxe OK) (F) Message final lorsqu'un I<perl -c> a réussi. 
 
-#if defined(perldiag560)
-=item System V %s is not implemented on this machine
-
-(I<%s> de System V n'est pas implémenté sur cette machine) (F) Vous
-avez essayé de faire quelque chose avec une fonction commençant par
-C<sem>, C<shm> ou C<msg> mais cet IPC System V n'est pas implémenté
-sur votre machine. (Sur certaines machines, la fonctionnalité peut
-exister mais peut ne pas être configurée.) 
-
-#endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item System V %s is not implemented on this machine
 
 (I<%s> de System V n'est pas implémenté sur cette machine) (F) Vous
@@ -5445,6 +5747,16 @@ C<sem>, C<shm> ou C<msg> mais cet IPC System V n'est pas implémenté
 sur votre machine. (Sur certaines machines, la fonctionnalité peut
 exister mais peut ne pas être configurée.) Adressez-vous à votre 
 support système.
+
+#endif
+#if defined(perldiag560)
+=item System V %s is not implemented on this machine
+
+(I<%s> de System V n'est pas implémenté sur cette machine) (F) Vous
+avez essayé de faire quelque chose avec une fonction commençant par
+C<sem>, C<shm> ou C<msg> mais cet IPC System V n'est pas implémenté
+sur votre machine. (Sur certaines machines, la fonctionnalité peut
+exister mais peut ne pas être configurée.) 
 
 #endif
 =item syswrite() on closed filehandle %s
@@ -5468,7 +5780,7 @@ d'utiliser la fonction C<tell()> sur un handle de fichier qui n'a
 jamais été ouvert ou qui a été fermé depuis. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item tell() on unopened filehandle
 
 (C<tell> sur un handle de fichier non ouvert) (W unopened) Vous avez
@@ -5482,6 +5794,25 @@ jamais été ouvert, ou bien qui a été fermé.
 (Test sur un fichier non ouvert I<%s>) (W unopened) Vous avez essayé
 d'invoquer un opérateur de test de fichier sur un handle de fichier
 qui n'est pas ouvert. Vérifiez votre logique. 
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item That use of $[ is unsupported
+
+(Cette utilisation de C<$[> n'est pas supportée) (F) L'affectation de
+C<$[> est maintenant strictement circonscrite et interprétée comme
+une directive de compilation. Vous devez maintenant écrire une seule
+possibilité parmi celles-ci :
+
+  $[ = 0;
+  $[ = 1;
+  ...
+  local $[ = 0;
+  local $[ = 1;
+  ...
+
+Ceci est imposé pour prévenir le problème d'un module changeant par inadvertance la
+base des tableaux pour un autre module. Cf. L<perlvar/$[>.
 
 #endif
 #if defined(perldiag560)
@@ -5504,23 +5835,15 @@ Ceci est imposé pour prévenir le problème d'un module changeant la
 base des tableaux depuis un autre module par inadvertance.
 
 #endif
-#if defined(perldiag573)
-=item That use of $[ is unsupported
+#if defined(perldiag580) or defined(perldiag573)
+=item The crypt() function is unimplemented due to excessive paranoia
 
-(Cette utilisation de C<$[> n'est pas supportée) (F) L'affectation de
-C<$[> est maintenant strictement circonscrite et interprétée comme
-une directive de compilation. Vous devez maintenant écrire une seule
-possibilité parmi celles-ci :
-
-  $[ = 0;
-  $[ = 1;
-  ...
-  local $[ = 0;
-  local $[ = 1;
-  ...
-
-Ceci est imposé pour prévenir le problème d'un module changeant par inadvertance la
-base des tableaux pour un autre module. Cf. L<perlvar/$[>.
+(La fonction C<crypt()> n'est pas implémentée à cause d'une paranoïa
+excessive) (F) I<Configure> n'a pas pu trouver la fonction C<crypt> sur 
+votre machine, probablement parce que votre fournisseur ne l'a
+pas fournie, probablement parce qu'il pense que le gouvernement des États-Unis
+d'Amérique pense que c'est un secret ou du moins continue à prétendre que 
+c'en est un. Et si vous me citez comme source, j'opposerai un démenti.
 
 #endif
 #if defined(perldiag560)
@@ -5532,17 +5855,6 @@ sur votre machine, probablement parce que votre vendeur ne l'a pas
 fournie, probablement parce qu'il pense que le gouvernement des
 États-Unis pense que c'est un secret ou du moins continue à prétendre
 que c'en est un. 
-
-#endif
-#if defined(perldiag573)
-=item The crypt() function is unimplemented due to excessive paranoia
-
-(La fonction C<crypt()> n'est pas implémentée à cause d'une paranoïa
-excessive) (F) I<Configure> n'a pas pu trouver la fonction C<crypt> sur 
-votre machine, probablement parce que votre fournisseur ne l'a
-pas fournie, probablement parce qu'il pense que le gouvernement des États-Unis
-d'Amérique pense que c'est un secret ou du moins continue à prétendre que 
-c'en est un. Et si vous me citez comme source, j'opposerai un démenti.
 
 #endif
 =item The %s function is unimplemented
@@ -5561,7 +5873,7 @@ déjà passé le lien symbolique pour obtenir le fichier réel. Utilisez
 un véritable nom de fichier à la place. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item The stat preceding %s wasn't an lstat
 
 (Le C<stat> précédent n'était pas un C<lstat>) (F) Cela n'a aucun sens
@@ -5571,7 +5883,14 @@ lien symbolique pour obtenir le fichier réel. Utilisez le nom du fichier
 à la place.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag560)
+=item This Perl can't reset CRTL environ elements (%s)
+
+(Cette copie de Perl ne peut pas réinitialiser les éléments de
+l'environnement de CRTL (I<%s>)) 
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item This Perl can't reset CRTL environ elements (%s)
 
 (Cette version de Perl ne peut pas réinitialiser les éléments de
@@ -5583,13 +5902,6 @@ allez être obligé de reconstruire Perl avec un CTRL muni de C<setenv>,
 ou bien redéfinir F<PERL_ENV_TABLES> (Cf. L<perlvms>) de sorte que le
 tableau d'environnement ne sera pas la cible des modifications à
 C<%ENV>, modifications qui ont déclenché l'avertissement.
-
-#endif
-#if defined(perldiag560)
-=item This Perl can't reset CRTL environ elements (%s)
-
-(Cette copie de Perl ne peut pas réinitialiser les éléments de
-l'environnement de CRTL (I<%s>)) 
 
 #endif
 #if defined(perldiag560)
@@ -5606,7 +5918,7 @@ I<perlvms>(1)) pour que le tableau d'environnement ne soit pas la
 cible de la modification de C<%ENV> qui a produit cet avertissement. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item This Perl can't set CRTL environ elements (%s=%s)
 
 (Cette version de Perl ne peut pas alimenter les éléments de
@@ -5618,6 +5930,12 @@ allez être obligé de reconstruire Perl avec un CTRL muni de C<setenv>,
 ou bien redéfinir F<PERL_ENV_TABLES> (Cf. L<perlvms>) de sorte que le
 tableau d'environnement ne sera pas la cible des modifications à
 C<%ENV>, modifications qui ont déclenché l'avertissement.
+
+#endif
+#if defined(perldiag580)
+=item thread failed to start: %s
+
+(F) The entry point function of threads->create() failed for some reason.
 
 #endif
 =item times not implemented
@@ -5659,17 +5977,6 @@ B<-m>. Il s'agit d' une erreur car les options B<-M> et B<-m> ne sont
 pas prévues pour être utilisées à l'intérieur des scripts. Utilisez le
 pragma C<use> à la place.
 
-#if defined(perldiag573)
-=item Too late to run %s block
-
-(Trop tard pour lancer le bloc I<%s>) (W void) Votre programme définit
-un bloc C<CHECK> ou C<INIT> à la phase d'exécution à proprement
-parler, alors que le moment où ils devraient être exécutés est déjà
-passe. Peut-être avez-vous chargé un fichier par C<require> ou par
-C<do>, alors que vous auriez dû le charger par C<use>. Ou peut-être
-vaut-il mieux insérer le C<require> ou le C<do> dans un bloc C<BEGIN>.
-
-#endif
 #if defined(perldiag560)
 =item Too late to run %s block
 
@@ -5679,6 +5986,17 @@ lancer est déjà passée. Vous chargez peut-être un fichier avec
 C<require> ou C<do> alors que vous devriez utiliser C<use> à la
 place. Ou vous devriez peut-être mettre le C<require> ou le C<do> à
 l'intérieur d'un bloc C<BEGIN>. 
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Too late to run %s block
+
+(Trop tard pour lancer le bloc I<%s>) (W void) Votre programme définit
+un bloc C<CHECK> ou C<INIT> à la phase d'exécution à proprement
+parler, alors que le moment où ils devraient être exécutés est déjà
+passe. Peut-être avez-vous chargé un fichier par C<require> ou par
+C<do>, alors que vous auriez dû le charger par C<use>. Ou peut-être
+vaut-il mieux insérer le C<require> ou le C<do> dans un bloc C<BEGIN>.
 
 #endif
 =item Too many args to syscall
@@ -5705,7 +6023,7 @@ via I<csh> au lieu de le soumettre à Perl. Vérifiez la ligne C<#!> ou
 lancez vous-même votre script manuellement dans Perl avec I<perl
 nom_script>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Trailing \ in regex m/%s/
 
 (\ à la fin de l'expression rationnelle C<m/>I<%s>C</>) (F)
@@ -5734,12 +6052,22 @@ variables C<$tr> ou C<$y> peut causer cette erreur.
 n'a pas pu trouver le délimiteur final d'une construction C<tr///> ou
 C<tr[][]>. 
 
+#if defined(perldiag561) or defined(perldiag560)
 =item truncate not implemented
 
 (C<truncate> non implémenté) (F) Votre machine n'implémente pas de
 mécanisme de troncation de fichier que I<Configure> puisse
 reconnaître. 
 
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item truncate not implemented
+
+(C<truncate> n'est pas implémenté) (F) Votre machine n'implémente pas
+de mécanisme de troncation de fichier que I<Configure> puisse
+reconnaître. 
+
+#endif
 =item Type of arg %d to %s must be %s (not %s)
 
 (Le type de l'argument I<%d> de I<%s> doit être I<%s> (pas I<%s>)) (F)
@@ -5854,7 +6182,7 @@ C<unexec> a échoué pour une raison ou pour une autre. Voir votre
 représentant local FSF (I<Free Software Fondation>), qui l'a
 probablement mis là en premier lieu. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unicode character %s is illegal
 
 (Le caractère Unicode I<%s> est illégal) (W utf8) Certains caractères
@@ -5868,6 +6196,14 @@ supprimer cet avertissement avec C<no warnings 'utf8';>.
 (C<BYTEORDER> inconnu) (F) Il n'y a aucune fonction d'échange
 d'octets pour une machine fonctionnant avec cet ordre d'octets. 
 
+#if defined(perldiag580)
+=item Unknown open() mode '%s'
+
+(F) The second argument of 3-argument open() is not among the list
+of valid modes: C<< < >>, C<< > >>, C<<< >> >>>, C<< +< >>,
+C<< +> >>, C<<< +>> >>>, C<-|>, C<|->, C<< <& >>, C<< >& >>.
+
+#endif
 =item Unknown open() mode '%s'
 
 (Mode d'C<open()> 'I<%s>' inconnu) (F) Le deuxième argument d'un
@@ -5892,7 +6228,7 @@ sont I<%s>)) Vous avez essayé d'utiliser un sous-pragma inconnu pour
 le pragma « re ».
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unknown switch condition (?(%.2s in regex;
 
 marked by <-- HERE in m/%s/
@@ -5909,7 +6245,7 @@ correspondant à ce nombre a obtenu une correspondance). La mention
 L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unknown warnings category '%s'
 
 (Catégorie d'avertissements « I<%s> » inconnue)
@@ -5921,7 +6257,7 @@ répertoriée dans un module (par exemple C<use warnings 'File::Find'>),
 il faut avoir importé ce module au préalable.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item unmatched ( in regex; marked by <-- HERE in m/%s/
 
 (« C<(> » sans correspondant dans une expression rationnelle) (F) Les
@@ -5931,7 +6267,7 @@ trouver les correspondances de parenthèses. La mention « <-- HERE »
 indique l'endroit où le problème a été constaté. Cf L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item unmatched [ in regex; marked by <-- HERE in m/%s/
 
 (« C<[> » sans correspondant dans une expression rationnelle) (F) Les
@@ -5982,7 +6318,7 @@ dans son nom. Vous pouvez également le déclarer en tant que
 sous-programme. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unquoted string "%s" may clash with future reserved word
 
 (Chaîne sans guillemets ni apostrophes « I<%s> » susceptible d'être
@@ -6027,7 +6363,7 @@ littéralement.
 misc) Vous avez employé une combinaison avec un caractère antislash
 qui n'est pas reconnue. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unrecognized escape \\%c passed through in regex;
 
 marked by <-- HERE in m/%s/
@@ -6072,7 +6408,7 @@ Cf. L<perlfunc/chomp>.
 Votre machine ne supporte pas C<opendir> et C<readdir>. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unsupported directory function "%s" called
 
 (Appel de la fonction non supportée « I<%s> » sur les répertoires) (F)
@@ -6097,7 +6433,7 @@ supportent C<fork>, d'autres non. Essayez de changer le nom que vous
 utilisez pour appelez Perl en C<perl_>, C<perl__> et ainsi de suite.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unsupported function fork
 
 (Fonction C<fork> non supportée) (F) Votre version d'exécutable ne
@@ -6109,7 +6445,7 @@ C<fork>, d'autres non. Essayez de changer le nom que vous utilisez
 pour Perl en C<perl_>, C<perl__>et ainsi de suite.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unsupported script encoding
 
 (Cet encodage de script n'est pas supporté) (F) Votre programme
@@ -6141,7 +6477,7 @@ correspondante. Vous devez ajouter (ou enlever) un caractère
 antislash pour équilibrer vos parenthèses. 
 Cf. L<attributes>.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Unterminated compressed integer
 
 (L'entier compressé n'est pas terminé) (F) L'argument d'un
@@ -6165,7 +6501,7 @@ C<< < >> signifiant «inférieur à ».
 toujours) (W untie) Une copie de l'objet renvoyé par C<tie> (ou par
 C<tied>) était toujours valide lorsqu'C<untie> a été appelé. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Useless (?-%s) - don't use /%s modifier in regex;
 
 marked by <-- HERE in m/%s/
@@ -6185,7 +6521,7 @@ La mention « <-- HERE » indique l'endroit où le problème a été constaté.
 Cf L<perlre>.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Useless (?%s) - use /%s modifier in regex;
 
 marked by <-- HERE in m/%s/
@@ -6205,40 +6541,7 @@ La mention « <-- HERE » indique l'endroit où le problème a été constaté.
 Cf L<perlre>.
 
 #endif
-#if defined(perldiag560)
-=item Useless use of %s in void context
-
-(Utilisation inutile de I<%s> dans un contexte vide) (W void) Vous
-avez fait quelque chose sans effet de bord dans un contexte qui ne
-fait rien de la valeur de retour, comme une instruction ne renvoyant
-pas de valeur depuis un bloc ou le côté gauche d'un opérateur
-scalaire virgule. Par exemple, vous obtiendrez ceci si vous confondez
-les précédences en C avec les précédences en Python en écrivant : 
-
-  $un, $deux = 1, 2;
-
-alors que vous vouliez dire :
-
-  ($un, $deux) = (1, 2);
-
-Une autre erreur courante est l'utilisation de parenthèses ordinaires
-pour construire une liste de références alors vous devriez utiliser
-des accolades ou des crochets, par exemple, si vous écrivez :
-
-  $tableau = (1,2);
-
-alors que vous vouliez dire :
-
-  $tableau = [1,2];
-
-Les crochets transforment explicitement une valeur de liste en une
-valeur scalaire tandis que les parenthèses ne le font pas. Donc,
-lorsqu'une liste entre parenthèses est évaluée dans un contexte
-scalaire, la virgule est traitée comme l'opérateur virgule du C, qui
-rejette l'argument de gauche, ce qui n'est pas ce que vous voulez.
-
-#endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Useless use of %s in void context
 
 (Utilisation inutile de I<%s> dans un contexte vide) (W void) Vous
@@ -6284,7 +6587,40 @@ Les constantes chaînes de caractères donnant un « 0 » ou un « 1 » produisent
 quand même l'avertissement.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag560)
+=item Useless use of %s in void context
+
+(Utilisation inutile de I<%s> dans un contexte vide) (W void) Vous
+avez fait quelque chose sans effet de bord dans un contexte qui ne
+fait rien de la valeur de retour, comme une instruction ne renvoyant
+pas de valeur depuis un bloc ou le côté gauche d'un opérateur
+scalaire virgule. Par exemple, vous obtiendrez ceci si vous confondez
+les précédences en C avec les précédences en Python en écrivant : 
+
+  $un, $deux = 1, 2;
+
+alors que vous vouliez dire :
+
+  ($un, $deux) = (1, 2);
+
+Une autre erreur courante est l'utilisation de parenthèses ordinaires
+pour construire une liste de références alors vous devriez utiliser
+des accolades ou des crochets, par exemple, si vous écrivez :
+
+  $tableau = (1,2);
+
+alors que vous vouliez dire :
+
+  $tableau = [1,2];
+
+Les crochets transforment explicitement une valeur de liste en une
+valeur scalaire tandis que les parenthèses ne le font pas. Donc,
+lorsqu'une liste entre parenthèses est évaluée dans un contexte
+scalaire, la virgule est traitée comme l'opérateur virgule du C, qui
+rejette l'argument de gauche, ce qui n'est pas ce que vous voulez.
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item Useless use of "re" pragma
 
 (Utilisation inutile du pragma « C<re> ») (W) Vous avez écrit C<use
@@ -6298,7 +6634,7 @@ re;> sans aucun argument. Ceci n'est vraiment pas très utile.
 re> sans aucun argument. Ceci n'est vraiment pas très utile. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Useless use of sort in scalar context
 
 (Utilisation inutile du tri en contexte scalaire)
@@ -6310,7 +6646,7 @@ Ce n'est pas très utile, et perl optimise votre programme en éliminant
 le tri.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Useless use of %s with no values
 
 (Utilisation inutile de I<%s> sans valeurs)
@@ -6337,7 +6673,7 @@ la forme explicite avec des guillemets ou des apostrophes si vous
 désirez utiliser une ligne vide comme délimiteur final d'un document
 « ici-même » (I<N.d.T.> : I<here document>). 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Use of chdir('') or chdir(undef) as chdir() deprecated
 
 (Utilisation de C<chdir('')> ou de C<chdir(undef)> pour C<chdir()> dépréciée)
@@ -6351,7 +6687,22 @@ Transmettez une valeur définie et différente de blanc, sinon
 vous vous retrouverez dans votre répertoire personnel.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580)
+=item Use of /c modifier is meaningless in s///
+
+(W regexp) You used the /c modifier in a substitution.  The /c
+modifier is not presently meaningful in substitutions.
+
+#endif
+#if defined(perldiag580)
+=item Use of /c modifier is meaningless without /g
+
+(W regexp) You used the /c modifier with a regex operand, but didn't
+use the /g modifier.  Currently, /c is meaningful only when /g is
+used.  (This may change in the future.)
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
 =item Use of *glob{FILEHANDLE} is deprecated
 
 (L'utilisation de C<*glob{FILEHANDLE}> est dépréciée)
@@ -6359,14 +6710,12 @@ vous vous retrouverez dans votre répertoire personnel.
 plus concise C<*glob{IO}> pour accéder au handle de fichier dans un typeglob.
 
 #endif
-#if defined(perldiag573)
-=item Use of implicit split to @_ is deprecated
+#if defined(perldiag580)
+=item Use of /g modifier is meaningless in split
 
-(L'Utilisation d'un C<split> implicite sur C<@_> est dépréciée) (D
-deprecated) Vous donnez beaucoup de travail au compilateur lorsque
-vous écrasez la liste d'arguments d'un sous-programme , Il vaut donc
-mieux affecter explicitement les résultats d'un C<split> à un tableau
-(ou à une liste).
+(W regexp) You used the /g modifier on the pattern for a C<split>
+operator.  Since C<split> always tries to match the pattern
+repeatedly, the C</g> has no effect.
 
 #endif
 #if defined(perldiag560)
@@ -6377,6 +6726,16 @@ deprecated) Vous donnez beaucoup de travail au compilateur lorsque
 vous écrasez la liste d'arguments d'un sous-programme, il vaut donc
 mieux affecter explicitement les résultats d'un C<split> à un tableau
 (ou à une liste). 
+
+#endif
+#if defined(perldiag580) or defined(perldiag573)
+=item Use of implicit split to @_ is deprecated
+
+(L'utilisation d'un C<split> implicite sur C<@_> est dépréciée) (D
+deprecated) Vous donnez beaucoup de travail au compilateur lorsque
+vous écrasez la liste d'arguments d'un sous-programme. Il vaut donc
+mieux affecter explicitement les résultats d'un C<split> à un tableau
+(ou à une liste).
 
 #endif
 =item Use of inherited AUTOLOAD for non-method %s() is deprecated
@@ -6437,7 +6796,7 @@ indiquée n'est plus recommandée, généralement parce qu'il y a une
 meilleure façon de faire et également parce que l'ancienne méthode a
 de mauvais effets de bord. 
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Use of -l on filehandle %s
 
 (Utilisation de C<-l> sur le handle de fichier I<%s>)
@@ -6447,7 +6806,7 @@ symbolique auquel vous vous intéressez. L'opération renvoie C<undef>.
 Utilisez plutôt un nom de fichier.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Use of "package" with no arguments is deprecated
 
 (L'utilisation de « C<package> » sans argument est dépréciée)
@@ -6475,6 +6834,19 @@ les opérateurs de conversion en nombre ou en chaîne, et dans ce cas on
 peut supposer que vous savez ce que vous faites.
 
 #endif
+#if defined(perldiag580)
+=item Use of reference "%s" as array index
+
+(W misc) You tried to use a reference as an array index; this probably
+isn't what you mean, because references in numerical context tend
+to be huge numbers, and so usually indicates programmer error.
+
+If you really do mean it, explicitly numify your reference, like so:
+C<$array[0+$ref]>.  This warning is not given for overloaded objects,
+either, because you can overload the numification and stringification
+operators and then you assumedly know what you are doing.
+
+#endif
 =item Use of reserved word "%s" is deprecated
 
 (L'utilisation du mot réservé « I<%s> » est dépréciée) (D deprecated)
@@ -6497,6 +6869,15 @@ le faire, mais dans une prochaine version de perl cela sera une erreur
 fatale. Supprimez le marquage de vos arguments. Cf. L<perlsec>.
 
 #endif
+#if defined(perldiag580)
+=item Use of tainted arguments in %s is deprecated
+
+(W taint, deprecated) You have supplied C<system()> or C<exec()> with multiple
+arguments and at least one of them is tainted.  This used to be allowed
+but will become a fatal error in a future version of perl.  Untaint your
+arguments.  See L<perlsec>.
+
+#endif
 #if defined(perldiag560)
 =item Use of uninitialized value %s
 
@@ -6507,7 +6888,7 @@ peut-être est-ce une erreur. Pour supprimer cet avertissement,
 affectez une valeur définie à vos variables. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Use of uninitialized value%s
 
 (Utilisation de valeurI<%s> non initialiséeI<%s>) (W uninitialized)
@@ -6525,7 +6906,7 @@ l'avertissement fera référence à l'opérateur de C<concatenation (.)>,
 même s'il n'existe aucun C<.> dans votre programme.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Using a hash as a reference is deprecated
 
 (L'utilisation d'un hachage en tant que référence est dépréciée) (D
@@ -6536,7 +6917,7 @@ syntaxe, mais elles n'auraient pas dû. C'est maintenant une syntaxe
 dépréciée et elle disparaîtra d'une prochaine version.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Using an array as a reference is deprecated
 
 (L'utilisation d'un tableau en tant que référence est dépréciée) (D
@@ -6547,7 +6928,7 @@ elles n'auraient pas dû. C'est maintenant une syntaxe dépréciée et
 elle disparaîtra d'une prochaine version.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item UTF-16 surrogate %s
 
 (Séquence de remplacement UTF-16 I<%s>) (W utf8) Vous avez essayé de
@@ -6591,11 +6972,11 @@ dire que vous vous êtes trompé de drôle de caractère (C<$>, C<@>,
 C<%> ou C<&>) devant votre variable. 
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Variable "%s" is not imported%s
 
 (La variable « I<%s> » n'a pas été importée) (F) Alors que C<use
-strict> est en vigeur, vous avez fait référence à une variable globale
+strict> est en vigueur, vous avez fait référence à une variable globale
 que, semble-t-il, vous pensiez avoir importé d'un autre module, parce
 que quelque chose d'autre portant le même nom (habituellement un
 sous-programme) est exporté par ce module. Le plus souvent, la
@@ -6603,7 +6984,7 @@ signification de ceci est que vous vous êtes trompé de drôle de
 caractère au début de votre variable.
 
 #endif
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Variable length lookbehind not implemented in regex;
 
 marked by <-- HERE in m/%s/
@@ -6692,6 +7073,18 @@ de conversion d'une instruction I<use Module n.n LISTE> vers le bloc
 C<BEGIN> équivalent a trouvé une incohérence interne dans le numéro
 de version. 
 
+#if defined(perldiag580)
+=item v-string in use/require is non-portable
+
+(W portable) The use of v-strings is non-portable to older, pre-5.6, Perls.
+If you want your scripts to be backward portable, use the floating
+point version number: for example, instead of C<use 5.6.1> say
+C<use 5.006_001>.  This of course won't help: the older Perls
+won't suddenly start understanding newer features, but at least
+they will show a sensible error message indicating the required
+minimum version.
+
+#endif
 #if defined(perldiag573)
 =item v-string in use/require is non-portable
 
@@ -6742,7 +7135,7 @@ alors qu'en fait vous avez obtenu :
 Donc mettez des parenthèses pour dire ce que vous voulez vraiment
 dire.
 
-#if defined(perldiag573)
+#if defined(perldiag580) or defined(perldiag573)
 =item Wide character in %s
 
 (Caractère large dans I<%s>) 
@@ -6814,3 +7207,4 @@ qui n'est probablement pas ce que vous voulez. (Si I<c'est bien> ce
 que vous voulez, mettez une I<&> devant.) 
 
 =back
+

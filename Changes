@@ -1,5 +1,19 @@
 Revision history for Perl extension diagnostics.
 
+1.2-alpha1
+        - altered t/10-error.t so 5.6.0 will skip tests instead of returning NOK
+        - duplicated tests so 5.6.0 will test its own version and 5.6.1+ will skip them
+        - use File::Spec for the benefit of VMS users and Mac OS users
+        - search rules have been altered, so the French version of Foo::Bar will
+        be found in either Foo/Bar/perldiag.fr.pod or Foo/Bar.fr.pod
+TODO    - added an '-encoding' parameter (which requires Dan Kogai's
+	Encode.pm)
+	- order the messages in transmo by decreasing length, so the
+	first match will hopefully be also the best match.
+        - overhaul transmo and splainthis functions, so module can
+	deal with a single line containing two or more
+	messages. E.g. "Can"t locate method via package (perhaps you forgot...)"
+
 1.2-alpha Thu Apr 11 22:24:13 2002
 	- original version; created by h2xs 1.19, based on the 5.7.3 distribution
         - added splainthese function to fix bug # 20020425.019
@@ -7,7 +21,7 @@ Revision history for Perl extension diagnostics.
         - replaced Getopt::Std by Getopt::Long, and added parse_option function.
         - changed current debug statements to select which category to
 	print, and added many others.
-        - changed the "regexp-to-printf" converter, so extracting the
+        - changed the "printf-to-regexp" converter, so extracting the
 	square root or the logarithm of a negative number will be
 	properly explained.
 

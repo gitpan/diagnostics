@@ -84,13 +84,14 @@ the English version.
 
 =item -module
 
-The B<-module> option looks for a module-specific F<perldiag> file.
+The B<-module> option looks for a module-specific F<perldiag> file or for
+splanations within the POD documentation of the module itself.
 It can be abbreviated to B<-m>.
 
 If a module is specified, the errors and warnings from the Perl
 compiler / interpreter are not longer splained. Yet, if you specify
 the pseudo-module B<perl> together with the module you requested, the
-standard errors and warnings will be splained, as wll as the module's.
+standard errors and warnings will be splained, as well as the module's.
 
 =item -file
 
@@ -99,8 +100,12 @@ or in addition to, F<perldiag> files. The value is the absolute
 or relative pathname to the file.
 
 As with the B<-module> option, using this option disables the splanations
-for standard errors. And as the B<-module> option, the standard errors'
+for standard errors. And as with the B<-module> option, the standard errors'
 explanations are reenabled by adding the B<-module=perl> option.
+
+=item -encoding
+
+Select the output character encoding.
 
 =back
 
@@ -213,28 +218,14 @@ type:
     use diagnostics qw(-module=Foo::Bar -module=perl);
     use Foo::Bar;
 
-Yet, there is a catch. When comparing the actual errors to the errors
-contained in the F<perldiag.pod> files, the comparison ends with
-the first match, which is not always the right match. For example,
-compare the result of the following two programs:
-
-    use diagnostics qw(-module=lib -module=perl);
-    use lib '';
-
-    use diagnostics qw(-module=perl -module=lib);
-    use lib '';
-
-In the first case, you obtain the proper explanation, while in the second
-case you obtain the wrong one.
-
-The B<-module> and B-<lang> options may be combined. In this case,
+The B<-module> and B<-lang> options may be combined. In this case,
 by typing
 
     use diagnostics qw(-module=Foo::Bar -lang=fr);
     use Foo::Bar;
 
 the C<diagnostics> module will look only for F<Foo/Bar/perldiag.fr.pod> 
-in the various C<@INC> directories.
+or F<Foo/Bar.fr.pod> in the various C<@INC> directories.
 
 =head1 INTERNALS
 
@@ -247,10 +238,6 @@ to be honored, but only after the diagnostics::splainthese() function
 (the module's $SIG{__WARN__} interceptor) has had its way with your
 warnings.
 
-For backward compatibility, you can activate the various options
-by initializing the variables C<$diagnostics::PRETTY> or
-C<$diagnostics::DEBUG> and other instead of using dash options.
-
 There is a B<-debug> option and a C<$diagnostics::DEBUG> variable you
 may set if you're desperately curious what sorts of things are being
 intercepted.
@@ -261,9 +248,13 @@ This option contains powers of 2 OR'ed together. Each power of two prints
 some piece of debugging. For more information, RTFS (you were going to debug
 the module, so you would have Read The Famous Source anyhow, wouldn't ya?).
 
+For backward compatibility, you can activate the various options
+by initializing the variables C<$diagnostics::PRETTY> or
+C<$diagnostics::DEBUG> and other instead of using dash options.
+
 =head1 KNOWN BUGS
 
-Not being able to say "no diagnostics" is annoying, but may not be
+Not being able to say C<no diagnostics> is annoying, but may not be
 insurmountable.
 
 I could start up faster by delaying compilation until it should be
@@ -288,7 +279,7 @@ alpha version, and possibly fix it.
 
 If it is 1.2-alpha, report it to me C<JFORGET@cpan.org>. As long
 as the 5.8.1 version is not released I will support this
-version. After that, it will be a Perl-5 Porters' module
+version. After that, it will be a Perl-5 Porters' module again
 (although I will still be interested in it).
 
 =head1 AUTHORS
@@ -308,8 +299,9 @@ with some help from Gérald, Philippe, Rafael and O'Reilly France,
 use strict;
 use 5.006;
 use Carp;
+use File::Spec;
 
-our $VERSION = "1.2-alpha";
+our $VERSION = "1.2-alpha1";
 our $DEBUG; #   1 for the search for POD files
             #   2 for the parsing of POD files
             #   4 for the final transmo subroutine
@@ -324,6 +316,7 @@ our @LANG;
 our @MODULES;
 our @FILES;
 our $PODFILE;
+our $ENCODING;
 
 use Config;
 my ($privlib, $archlib, $sitelib) = @Config{qw(privlibexp archlibexp sitelibexp)};
@@ -393,7 +386,8 @@ our %HTML_Escapes;
 
 *THITHER = $standalone ? *STDOUT : *STDERR;
 
-my $transmo;
+my $transmo;          # source of &transmo
+my @transmo;          # chunked source of &transmo
 
 my %msg;        # splanations for each message
 my %seen;       # true if error message already seen in any language
@@ -402,7 +396,7 @@ my %translated; # true if error message already seen in current language
 if ($standalone) {
     if (!@ARGV and -t STDIN) { print STDERR "$0: Reading from STDIN\n" } 
     while (defined (my $error = <>)) {
-	splainthis($error) || print THITHER $error;
+	splainthis($error) || print THITHER (convert($error));
     } 
     exit;
 } 
@@ -421,6 +415,7 @@ sub parse_options {
               ,  "lang=s@"    => \@LANG
               ,  "module=s@"  => \@MODULES
               ,  "file=s@"    => \@FILES
+              ,  "encoding=s" => \$ENCODING
 	      )
     }
     else {
@@ -435,6 +430,19 @@ sub first_time {
 
     @LANG = qw(en) unless @LANG;
     @MODULES = qw(perl) unless @MODULES || @FILES;
+    if ($ENCODING) {
+      $@ = '';
+      eval 'require Encode; my $x = Encode::encode("$ENCODING", "a")';
+    }
+    else {
+      $@ = q(Don't bother, use the default encoding')
+    }
+    if ($@) {
+      eval 'sub convert { $_[0] }'
+    }
+    else {
+      eval 'sub convert { Encode::encode($ENCODING, $_[0]) }'
+    }
     print STDERR @LANG, "\n" if $DEBUG & 1;
     my @podfiles = map { diagnostics::findpods($_, @LANG) } @MODULES;
     # handy for development testing of new warnings etc
@@ -444,7 +452,7 @@ sub first_time {
     if ($DEBUG & 1) {
         local $_;
         print STDERR "Found podfiles\n";
-        print join(' ', @$_, "\n") foreach @podfiles;
+        print STDERR join(' ', @$_, "\n") foreach @podfiles;
     }
     *HTML_Escapes = do {
         if ($standalone) {
@@ -495,6 +503,10 @@ EOFUNC
         readpod('en', '', 1);
         die "No diagnostics?" unless %msg;
     }
+        while (@transmo) {
+          my $chunk = pop @transmo;
+          $transmo .= $chunk  if $chunk;
+	}
         $transmo .= "    return 0;\n}\n";
         print STDERR $transmo if $DEBUG & 4;
         eval $transmo;
@@ -545,43 +557,45 @@ sub findpods {
 sub findpod {
   my ($module, $lang) = @_;
   my $startstop = 1; # need start and stop tags, (0 -> automatic start and stop)
-  $module =~ s(::)(/)g; ####### NOT PORTABLE! UNIX AND WIN ONLY!
+  my $modulepm  = File::Spec->catfile(split '::', "$module.pm");
+  $modulepm     = File::Spec->catfile(split '::', "$module.$lang.pod") unless $lang eq 'en';
+  my $moduledir = File::Spec->catdir(split '::', $module);
+  my $perldiag  = $lang eq 'en' ? 'perldiag.pod' : "perldiag.$lang.pod";
   my @trypod;
   if ($lang eq 'en' && $module eq 'perl') {
       $startstop = 0; # automatic start / stop for backward compatibility
       @trypod = (
-	   "$archlib/pod/perldiag.pod",
-	   "$privlib/pod/perldiag-$Config{version}.pod",
-	   "$privlib/pod/perldiag.pod",
-	   "$archlib/pods/perldiag.pod",
-	   "$privlib/pods/perldiag-$Config{version}.pod",
-	   "$privlib/pods/perldiag.pod",
+	  File::Spec->catfile($archlib, 'pod',  "perldiag.pod"),
+	  File::Spec->catfile($privlib, 'pod',  "perldiag-$Config{version}.pod"),
+	  File::Spec->catfile($privlib, 'pod',  "perldiag.pod"),
+	  File::Spec->catfile($archlib, 'pods', "perldiag.pod"),
+	  File::Spec->catfile($privlib, 'pods', "perldiag-$Config{version}.pod"),
+	  File::Spec->catfile($privlib, 'pods', "perldiag.pod"),
 	  );
     }
   elsif ($module eq 'perl') {
       @trypod = (
-	   "$sitelib/pod/perldiag.$lang.pod",
-	   "$sitelib/pod/perldiag-$Config{version}.$lang.pod",
-	   "$archlib/pod/perldiag.$lang.pod",
-	   "$archlib/pod/perldiag-$Config{version}.$lang.pod",
-	   "$privlib/pod/perldiag.$lang.pod",
-	   "$privlib/pod/perldiag-$Config{version}.$lang.pod",
-	   "$sitelib/perldiag.$lang.pod",
-	   "$sitelib/perldiag-$Config{version}.$lang.pod",
-	   "$archlib/perldiag.$lang.pod",
-	   "$archlib/perldiag-$Config{version}.$lang.pod",
-	   "$privlib/perldiag.$lang.pod",
-	   "$privlib/perldiag-$Config{version}.$lang.pod",
-	   "./pod/perldiag.$lang.pod",
-	   "./pod/perldiag-$Config{version}.$lang.pod",
-	   "./perldiag.$lang.pod",
-	   "./perldiag-$Config{version}.$lang.pod",
+	  File::Spec->catfile($sitelib, 'pod', "perldiag.$lang.pod"),
+	  File::Spec->catfile($sitelib, 'pod', "perldiag-$Config{version}.$lang.pod"),
+	  File::Spec->catfile($archlib, 'pod', "perldiag.$lang.pod"),
+	  File::Spec->catfile($archlib, 'pod', "perldiag-$Config{version}.$lang.pod"),
+	  File::Spec->catfile($privlib, 'pod', "perldiag.$lang.pod"),
+	  File::Spec->catfile($privlib, 'pod', "perldiag-$Config{version}.$lang.pod"),
+	  File::Spec->catfile($sitelib, "perldiag.$lang.pod"),
+	  File::Spec->catfile($sitelib, "perldiag-$Config{version}.$lang.pod"),
+	  File::Spec->catfile($archlib, "perldiag.$lang.pod"),
+	  File::Spec->catfile($archlib, "perldiag-$Config{version}.$lang.pod"),
+	  File::Spec->catfile($privlib, "perldiag.$lang.pod"),
+	  File::Spec->catfile($privlib, "perldiag-$Config{version}.$lang.pod"),
+	  File::Spec->catfile(File::Spec->curdir, 'pod', "perldiag.$lang.pod"),
+	  File::Spec->catfile(File::Spec->curdir, 'pod', "perldiag-$Config{version}.$lang.pod"),
+	  File::Spec->catfile(File::Spec->curdir, "perldiag.$lang.pod"),
+	  File::Spec->catfile(File::Spec->curdir, "perldiag-$Config{version}.$lang.pod"),
 	  );
     }
-  elsif ($lang eq 'en') 
-    { @trypod = map { ("$_/$module/perldiag.pod", "$_/$module.pm") } ( $sitelib, ".", @INC ) }
   else
-    { @trypod = map { "$_/$module/perldiag.$lang.pod" } ( $sitelib, ".", @INC ) }
+    { @trypod = map { File::Spec->catfile($_, $moduledir, $perldiag), 
+		      File::Spec->catfile($_, $modulepm) } ( $sitelib, ".", @INC ) }
   print STDERR join ' ', "$lang: trypod is", @trypod, "\n" if $DEBUG & 1;
   my $PODFILE = ((grep { -e } @trypod))[0];
   if ($^O eq 'MacOS') {
@@ -595,21 +609,23 @@ sub findpod {
 
 my $spec = qr(%[cdsg%]|%l?x|%\#?o|%\d*\.?\d*f);
 #
-# Warning about unknown printf specifiers
+#     Warning about unknown printf specifiers 
+# and count the total length of constant substrings
 #
 sub checkprt {
   my ($line) = @_;
   my $l = $line;
   $l =~ s/$spec//g;  # Specifiers that we know about
-  $l =~ s/%ENV/ /g;  # Harmless string within the message
-  $l =~ s/%hash/ /g; # Harmless string within the message
-  $l =~ s/% may only be used//; # ditto
-  $l =~ s/missing the % in//;   # the same
-  $l =~ s/instead of %?//;      # ...
-  $l =~ s/access key '%_'//;    # ...
-  $l =~ s/Can't use %!//;       # ...
+  $l =~ s/%ENV/xENV/g;                            # Harmless constant string within the message
+  $l =~ s/%hash/xhash/g;                          # Harmless constant string within the message
+  $l =~ s/% may only be used/x may only be used/; # ditto
+  $l =~ s/missing the % in/missing the x in/;     # the same
+  $l =~ s/instead of %/instead of x/;             # ...
+  $l =~ s/access key '%_'/access key 'x_'/;       # ...
+  $l =~ s/Can't use %!/Can't use x!/;             # ...
 
-  print STDERR "Unknown %-sequence in $line\n" if $l =~ /%/;
+  print STDERR "Unknown %-sequence in $line\n" if $l =~ /%/ and $DEBUG & 128;
+  length $l;
 }
 #
 # Converts a printf specifier ("%s", "%d" and the like) into a regexp
@@ -729,9 +745,9 @@ sub readpod {
         next if $seen{$header}; # do not duplicate regexps in transmo
         $seen{$header} = 1;
 
-	if ($header =~ /%/) {
+	if ($header =~ /$spec/) {
 	    my $rhs = my $lhs = $header;
-            checkprt($lhs) if $DEBUG & 128;
+            my $l = checkprt($lhs);
             $lhs =~ s/(.*?)($spec)/"\Q$1\E" . prt2re($2) . "\377"/eg;
 	    print STDERR $lhs, "\n" if $DEBUG & 16;
 	    $lhs =~ s/\377([^\377]*)$/\Q$1\E/;
@@ -740,9 +756,9 @@ sub readpod {
 	    print STDERR $lhs, "\n" if $DEBUG & 16;
 	    $lhs =~ s/\.\*\?$/.*/; # Allow %s at the end to eat it all
 	    print STDERR $lhs, "\n" if $DEBUG & 8;
-	    $transmo .= "    s{^$lhs}\n     {\Q$rhs\E}s\n\t&& return 1;\n";
+	    $transmo[$l] .= "    s{^\\s*($lhs)}{}s\n\t&& return [\$1, \"\Q$rhs\E\"];\n";
 	} else {
-	    $transmo .= "    m{^\Q$header\E} && return 1;\n";
+	    $transmo[length $header] .= "    s{^\\s*(\Q$header\E)}{}\n\t&& return [\$1, \"\Q$header\E\"];\n";
 	} 
 
 	print STDERR "$WHOAMI: Duplicate entry: \"$header\"\n"
@@ -806,6 +822,7 @@ my $count;
 my $wantspace;
 sub splainthese {
     my $ret = 0;
+    print STDERR "splainthese:\n$_[0]\n" if $DEBUG & 32;
     foreach  my $line (split /\n+/, $_[0]) {
         # Do not use logical or, because of short-circuit. Bitwise is OK
         $ret |= splainthis("$line\n");
@@ -818,13 +835,17 @@ sub splainthis {
     print STDERR "splainthis:\n$_\n" if $DEBUG & 32;
     ### &finish_compilation unless %msg;
     s/\.?\n+$//;
+    my @k_list;
     my $orig = $_;
     # return unless defined;
+
+    # removing the pointer to the input file
     s/, <.*?> (?:line|chunk).*$//;
     if ($DEBUG & 32)  {
         print STDERR "\$_\n$_\n";
         print STDERR "\$orig\n$orig\n";
     }
+    # removing the pointer to the script
     my $real = s/(.*?)\s+at .*? (?:line|chunk) \d+.*/$1/;
     s/^\((.*)\)$/$1/;
     if ($DEBUG & 32)  {
@@ -835,48 +856,63 @@ sub splainthis {
 	print STDERR "$msg{$_}\n";
     }
     if ($exact_duplicate{$orig}++) {
-        print STDERR "Duplicate $orig\n" if $DEBUG & 32;
-	return &transmo;
+        my $pair;
+        push @k_list, $pair while $pair = &transmo; # yes, this is a single =
+        #print STDERR "Duplicate $orig\ntransmo returned $rc ($-[0] $+[0])\n" if $DEBUG & 32;
+	return scalar @k_list;
     }
     else {
-	return 0 unless &transmo;
+        my $pair;
+        push @k_list, $pair while $pair = &transmo; # yes, this is a single =
+        #print STDERR "transmo returned $rc ($-[0] $+[0])\n" if $DEBUG & 32;
+	return 0 unless @k_list;
     }
     $orig = shorten($orig);
     if ($DEBUG & 32)  {
-        print STDERR "\$_\n$_\n";
         print STDERR "\$orig\n$orig\n";
-        print STDERR "\$real\n$real\n";
-	print STDERR "\$msg{$_}\n";
-	print STDERR "$msg{$_}\n";
+        print STDERR "\$real $real\n";
+	print STDERR "\@k_list\n";
+	print STDERR "$_->[0]\n$_->[1]\n" foreach @k_list;
     }
-    if ($old_diag{$_}) {
+    # If two or more basic messages, print the full message once with pointers
+    # to the script and input file, then print the basic messages without pointers
+    print THITHER (convert("$orig\n")) if @k_list >= 2;
+foreach (@k_list) {
+    if ($old_diag{$_->[1]}) {
 	autodescribe();
-	print THITHER "$orig (#$old_diag{$_})\n";
+        if (@k_list >= 2)
+	  { print THITHER (convert("$_->[0] (#$old_diag{$_->[1]})\n")) } # basic message without pointers
+        else
+	  { print THITHER (convert("$orig (#$old_diag{$_->[1]})\n")) } # basic message with pointers
 	$wantspace = 1;
     } else {
 	autodescribe();
-	$old_diag{$_} = ++$count;
-	print THITHER "\n" if $wantspace;
+	$old_diag{$_->[1]} = ++$count;
+	print THITHER (convert("\n")) if $wantspace;
 	$wantspace = 0;
-	print THITHER "$orig (#$old_diag{$_})\n";
-	if ($msg{$_}) {
-	    print THITHER $msg{$_};
+        if (@k_list >= 2)
+	  { print THITHER (convert("$_->[0] (#$old_diag{$_->[1]})\n")) } # basic message without pointers
+        else
+	  { print THITHER (convert("$orig (#$old_diag{$_->[1]})\n")) } # basic message with pointers
+	if ($msg{$_->[1]}) {
+	    print THITHER (convert($msg{$_->[1]}))
 	} else {
 	    if (0 and $standalone) { 
-		print THITHER "    **** Error #$old_diag{$_} ",
-			($real ? "is" : "appears to be"),
-			" an unknown diagnostic message.\n\n";
+		print THITHER (convert("    **** Error #$old_diag{$_->[1]} "
+			. ($real ? "is" : "appears to be")
+			. " an unknown diagnostic message.\n\n"));
 	    }
 	    return 0;
 	} 
     }
+  }
     return 1;
 } 
 
 sub autodescribe {
     if ($VERBOSE and not $count) {
 	print THITHER 
-		"\n$msg{DESCRIPTION}\n";
+		(convert("\n$msg{DESCRIPTION}\n"));
     } 
 } 
 
@@ -913,7 +949,7 @@ sub shorten {
 
 __END__ # wish diag dbase were more accessible
 
-=for the most curious
+=begin for curious people
 
 Why 33?  The first answer is, the value 1 is only a Perl tradition,
 not a requirement. Any true value will do (Cf. the Ram Book, introduction
@@ -961,4 +997,6 @@ Head nurse (to the young nurse):
 
 And the pilot and the nurse left... for the unoccupied
 half of France.
+
+=end for curious people
 

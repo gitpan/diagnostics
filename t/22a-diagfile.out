@@ -1,0 +1,18 @@
+    [./dummy.txt]
+    This is a dummy message for the used only once warning.
+    [perl]
+    (W once) Typographical errors often show up as unique variable names.
+    If you had a good reason for having a unique name, then just mention it
+    again somehow to suppress the message.  The our declaration is
+    provided for this purpose.
+    [perl]
+    (W uninitialized) An undefined value was used as if it were already
+    defined.  It was interpreted as a "" or a 0, but maybe it was a mistake.
+    To suppress this warning assign a defined value to your variables.
+    [./dummy.txt]
+    This is a dummy message for the division by zero.
+    [perl]
+    (F) You tried to divide a number by 0.  Either something was wrong in
+    your logic, or you need to put a conditional in to guard against
+    meaningless input.
+

@@ -2,6 +2,7 @@ MANIFEST
 Changes
 LISEZMOI
 README
+README.module.writer
 Makefile.PL
 diagnostics.pm
 dummy.txt
@@ -48,9 +49,15 @@ t/20-coreandmod.out
 t/20-coreandmod.pl
 t/21-enable.out
 t/21-enable.pl
+t/21a-enable.out
+t/21a-enable.pl
 t/22-diagfile.out
 t/22-diagfile.pl
+t/22a-diagfile.out
+t/22a-diagfile.pl
 t/23-percent-g.out
 t/23-percent-g.pl
+t/24-eval.out
+t/24-eval.pl
 t/99-expliq
 t/99-verbose

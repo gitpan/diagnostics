@@ -14,17 +14,9 @@ from /usr/local/bin or wherever.
 Then the usual 4-step incantation:
   perl Makefile.PL
   make
-  make test (*)
+  make test
 and with the proper authorization level
   make install
-
-(*) Note that some errors occur if you still have Perl 5.6.0. This only means
-that explanations in 5.6.1 were more precise and more complete than in
-5.6.0. Just try
-  perl -Mblib t/21-enable.pl
-  perl -Mblib t/22-diagfile.pl
-and use the TLAR method (that looks about right), comparing with
-t/21-enable.out and t/22-diagfile.out
 
 ALPHA WARNING
 
@@ -33,10 +25,10 @@ Please note that this is an alpha version. A few words of caution:
 - The naming scheme for perldiag files may change.
 - Translations exist only for 5.6.0, 5.6.1 and 5.7.3. Other Perl versions
 will have to do with either one.
+- You get French documentation even if you do not understand French.
 - splain has not been tested.
-- The module does not work on exotic architectures (VMS, Mac OS
-Classic, OS/390...). Maybe you can tell me what I should add to the
-module so it will work in the next version...
+- The module should work on exotic architectures (VMS, Mac OS
+Classic) thanks to File::Spec, but I have not tested that.
 
 
 DISTRIBUTION

@@ -1,0 +1,7 @@
+    (W once) Typographical errors often show up as unique variable names.
+    If you had a good reason for having a unique name, then just mention it
+    again somehow to suppress the message.  The our declaration is
+    provided for this purpose.
+    (W unopened) An I/O operation was attempted on a filehandle that was
+    never initialized.  You need to do an open() or a socket()
+    call, or call a constructor from the FileHandle package.

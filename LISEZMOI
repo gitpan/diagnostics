@@ -19,17 +19,9 @@ dans un répertoire du genre /usr/local/bin.
 Ensuite comme d'habitude :
   perl Makefile.PL
   make
-  make test (*)
+  make test
 et avec un niveau d'autorisation correct
   make install
-
-(*) Certains tests renvoient NOK sur Perl-5.6.0. C'est dû au fait
-que les explications sont plus succintes en 5.6.0 qu'en 5.6.1 
-et en 5.7.3. Mais essayez
-  perl -Mblib t/21-enable.pl
-  perl -Mblib t/22-diagfile.pl
-et voyez si cela correspond à peu près à t/21-enable.out et
-t/22-diagfile.out.
 
 AVERTISSEMENT, VERSION ALPHA
 
@@ -44,10 +36,9 @@ débrouiller avec l'une des deux),
 - je n'ai pas encore testé splain,
 - il y a sûrement de nouveaux messages en 5.8.0, mais je n'ai pas
 encore vérifié,
-- le module ne fonctionne pas sur les architectures exotiques (VMS,
-Mac OS Classic, OS/390); mais vous pouvez peut-être m'expliquer
-comment adapter le module pour que la prochaine version soit compatible
-avec ces architectures...
+- je n'ai pas testé le module sur des architectures exotiques (VMS,
+Mac OS Classic) ; ça devrait fonctionner, grâce à File::Spec, mais
+on ne sait jamais.
 
 DIFFUSION
 
